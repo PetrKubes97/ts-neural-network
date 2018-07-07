@@ -1,8 +1,3 @@
-import { NumericDictionary } from "lodash";
-
-type Matrix = number[][];
-type Vector = number[];
-
 export class NeuralCore {
   private inputSize: number;
   private hiddenLayerSizes: number[];
@@ -14,6 +9,8 @@ export class NeuralCore {
 
   private neurons: Neuron[][] = [];
   private connections: Connection[][] = [];
+
+  private trainSamples: TrainSample[] = [];
 
   constructor(inputSize: number, hiddenLayerSizes: number[], outputSize: number) {
     this.inputSize = inputSize;
@@ -56,7 +53,7 @@ export class NeuralCore {
       // For each neuron in the layer add all connections to neurons in the next layer
       this.connections[l] = [];
       this.neurons[l].forEach(neuron => {
-        this.neurons[l+1].forEach(nextNeuron => {
+        this.neurons[l + 1].forEach(nextNeuron => {
           const connection = new Connection(neuron, nextNeuron)
           neuron.addOutput(connection);
           nextNeuron.addInput(connection);
@@ -71,15 +68,81 @@ export class NeuralCore {
       throw 'Input size does not match';
     }
     // Reset, so each neuron is recalculated
-    this.neurons.forEach(layer => {layer.forEach(neuron => neuron.reset())})
+    this.neurons.forEach(layer => { layer.forEach(neuron => neuron.reset()) })
+    // Set input layer
+    this.neurons[0].forEach((neuron, idx) => { neuron.setInput(input[idx]) });
 
-    this.neurons[this.layerCnt-1].forEach(neuron => {
+    this.neurons[this.layerCnt - 1].forEach(neuron => {
       neuron.calculateActivation();
     });
-    console.log(this.connections);
-    console.log(this.neurons);
 
-    return this.neurons[this.layerCnt-1].map(neuron => neuron.getActivation());
+    return this.neurons[this.layerCnt - 1].map(neuron => neuron.getActivation());
+  }
+
+  public addTrainingSet(input: number[], output: number[]) {
+    this.trainSamples.push(new TrainSample(input, output))
+  }
+
+  public getCost(): number {
+    const costSum = this.trainSamples.reduce((costSum, sample, idx) => { // Add up all samples
+      this.evaluate(sample.input);
+      return costSum + this.neurons[this.layerCnt - 1].reduce((acc, neuron, i) => { // Add up all output neurons
+        return acc + (neuron.getActivation() - sample.output[i]) ** 2;
+      }, 0);
+    }, 0);
+
+    return 1 / 2 * costSum * (1 / this.trainSamples.length);
+  }
+
+  public train() {
+    this.trainSamples.forEach((sample) => {
+      this.evaluate(sample.input)
+
+      // Calculate sigmas of the last layer
+      this.neurons[this.layerCnt - 1].forEach((neuron, idx) => {
+        const newSigma =
+          (sample.output[idx] - neuron.getActivation()) * Activations.SIGMOID.der(neuron.getActivation());
+
+        neuron.setSigma(newSigma);
+      });
+
+      // Calculate sigmas for each neuron in the lower layers
+      for (let l = this.layerCnt - 2; l >= 0; l--) {
+        this.neurons[l].forEach((neuron) => {
+          const newSigma =
+            neuron.getOutputs().reduce((acc, connection) => {
+              return acc + connection.getOutputNeuron().getSigma() * connection.getWeight();
+            }, 0) * Activations.SIGMOID.der(neuron.getActivation());
+          neuron.setSigma(newSigma);
+        });
+      }
+
+      // Accumulate all weight updates
+      this.connections.forEach((connLayer) => {
+        connLayer.forEach((connection) => {
+          const weightChange =
+            connection.getOutputNeuron().getSigma() *
+            connection.getInputNeuron().getActivation();
+
+          connection.addSampleWeightChange(weightChange);
+        });
+      });
+    });
+
+    // Uff, let's hope everything works and apply the magic
+    this.connections.forEach((connLayer) => {
+      connLayer.forEach((connection) => {
+        connection.applyAverageWeight();
+      });
+    });
+  }
+
+  public getNeurons() {
+    return this.neurons;
+  }
+
+  public getConnections() {
+    return this.connections;
   }
 }
 
@@ -109,6 +172,18 @@ export class Neuron {
     this.inputs = null;
   }
 
+  public setInput(activation: number) {
+    if (!this.isInput) {
+      throw 'Cannot set activation of non-input neuron';
+    }
+
+    this.activation = activation;
+  }
+
+  public setSigma(sigma: number) {
+    this.sigma = sigma;
+  }
+
   public addInput(input: Connection) {
     this.inputs.push(input);
   };
@@ -117,12 +192,20 @@ export class Neuron {
     this.outputs.push(output);
   }
 
+  public getOutputs(): Connection[] {
+    return this.outputs;
+  }
+
   public reset() {
     this.isCalculated = false;
   }
 
   public getActivation(): number {
     return this.activation;
+  }
+
+  public getSigma() {
+    return this.sigma;
   }
 
   public calculateActivation(): number {
@@ -138,18 +221,37 @@ export class Connection {
   private weight: number = Math.random();
   private inputNeuron: Neuron;
   private outputNeuron: Neuron;
+  private sampleWeightChanges: number[] = [];
 
   constructor(input: Neuron, output: Neuron) {
     this.inputNeuron = input;
     this.outputNeuron = output;
   }
 
-  public updateWeight(newWeight: number) {
-    this.weight = newWeight;
+  public addSampleWeightChange(weightChange: number) {
+    this.sampleWeightChanges.push(weightChange);
+  }
+
+  public applyAverageWeight() {
+    const change = (this.sampleWeightChanges.reduce((acc, val) => acc + val, 0) / this.sampleWeightChanges.length);
+    this.weight += change;
+    this.sampleWeightChanges = [];
+  }
+
+  public getWeight() {
+    return this.weight;
   }
 
   public calculateValue() {
     return this.weight * this.inputNeuron.calculateActivation();
+  }
+
+  public getOutputNeuron() {
+    return this.outputNeuron;
+  }
+
+  public getInputNeuron() {
+    return this.inputNeuron;
   }
 }
 
@@ -161,4 +263,14 @@ export class Activations {
       return output * (1 - output);
     }
   };
+}
+
+export class TrainSample {
+  public input: number[];
+  public output: number[];
+
+  constructor(input: number[], output: number[]) {
+    this.input = input;
+    this.output = output;
+  }
 }
