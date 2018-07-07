@@ -11,13 +11,7 @@ let visualizer: Visualizer;
 const main = () => {
   const content: HTMLElement = document.getElementById('content');
   visualizer = new Visualizer(content);
-  neuralCore = new NeuralCore();
-
-  neuralCore.initNetwork(2, [2], 2, true);
-  
-  neuralCore.setTrainingSet([1,1], [0,1]);
-  for (let i = 0; i<1000; i++) {
-    neuralCore.train();
-  }
+  neuralCore = new NeuralCore(2, [5], 1);
+  console.log(neuralCore.evaluate([1, 1]));
   
 }
