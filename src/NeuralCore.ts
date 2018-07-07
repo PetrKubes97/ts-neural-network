@@ -7,6 +7,7 @@ export class NeuralCore {
 
   private rate = 1;
 
+  private biasNeuron = new Neuron('bias', )
   private neurons: Neuron[][] = [];
   private connections: Connection[][] = [];
 
@@ -52,13 +53,19 @@ export class NeuralCore {
     for (let l = 0; l < this.layerCnt - 1; l++) {
       // For each neuron in the layer add all connections to neurons in the next layer
       this.connections[l] = [];
-      this.neurons[l].forEach(neuron => {
-        this.neurons[l + 1].forEach(nextNeuron => {
-          const connection = new Connection(neuron, nextNeuron)
-          neuron.addOutput(connection);
+
+      this.neurons[l + 1].forEach(nextNeuron => { // If you wonder why this cycles are switched, it's because of the bias
+        this.neurons[l].forEach(currNeuron => {
+          const connection = new Connection(currNeuron, nextNeuron)
+          currNeuron.addOutput(connection);
           nextNeuron.addInput(connection);
           this.connections[l].push(connection);
         });
+
+        // Add bias neuron to each layer
+        const biasConnection = new Connection(this.biasNeuron, nextNeuron);
+        nextNeuron.addInput(biasConnection);
+        this.connections[l].push(biasConnection);
       });
     }
   }
@@ -122,7 +129,8 @@ export class NeuralCore {
         connLayer.forEach((connection) => {
           const weightChange =
             connection.getOutputNeuron().getSigma() *
-            connection.getInputNeuron().getActivation();
+            connection.getInputNeuron().getActivation() *
+            this.rate;
 
           connection.addSampleWeightChange(weightChange);
         });
@@ -157,9 +165,11 @@ export class Neuron {
   private sigma: number;
   private isInput: boolean = false;
   private isCalculated: boolean = false;
+  private isBias: boolean = false;
 
-  constructor(name: string) {
+  constructor(name: string, isBias = false) {
     this.name = name;
+    this.isBias = isBias;
   };
 
   public toString() {
@@ -201,6 +211,7 @@ export class Neuron {
   }
 
   public getActivation(): number {
+    if (this.isBias) return 1;
     return this.activation;
   }
 
@@ -209,11 +220,11 @@ export class Neuron {
   }
 
   public calculateActivation(): number {
-    if (!this.isInput && !this.isCalculated) {
+    if (!this.isInput && !this.isCalculated && !this.isBias) {
       this.activation = Activations.SIGMOID.output(this.inputs.reduce((acc, currConn) => acc + currConn.calculateValue(), 0));
       this.isCalculated = true;
     }
-    return this.activation;
+    return this.getActivation();
   }
 }
 

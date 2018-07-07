@@ -11,14 +11,14 @@ let visualizer: Visualizer;
 const main = () => {
   const content: HTMLElement = document.getElementById('content');
   visualizer = new Visualizer(content);
-  neuralCore = new NeuralCore(2, [6], 1);
+  neuralCore = new NeuralCore(2, [], 1);
   
   neuralCore.addTrainingSet([1,1], [1])
-  neuralCore.addTrainingSet([1,0], [1]);
-  neuralCore.addTrainingSet([0,1], [1]);
+  neuralCore.addTrainingSet([1,0], [0]);
+  neuralCore.addTrainingSet([0,1], [0]);
   neuralCore.addTrainingSet([0,0], [0])
 
-  for (let i = 0; i<5000; i++) {
+  for (let i = 0; i<2000; i++) {
     neuralCore.train();
     console.log(neuralCore.getCost());
   }
