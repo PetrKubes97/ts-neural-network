@@ -1,3 +1,7 @@
+import { Neuron } from "./Neuron";
+import { Connection } from "./Connection";
+import { TrainSample, Activations } from "./HelperClasses";
+
 export class NeuralCore {
   private inputSize: number;
   private hiddenLayerSizes: number[];
@@ -5,9 +9,9 @@ export class NeuralCore {
 
   private layerCnt: number;
 
-  private rate = 1;
+  private rate = 5;
 
-  private biasNeuron = new Neuron('bias', )
+  private biasNeuron = new Neuron('bias', true);
   private neurons: Neuron[][] = [];
   private connections: Connection[][] = [];
 
@@ -91,7 +95,7 @@ export class NeuralCore {
   }
 
   public getCost(): number {
-    const costSum = this.trainSamples.reduce((costSum, sample, idx) => { // Add up all samples
+    const costSum = this.trainSamples.reduce((costSum, sample) => { // Add up all samples
       this.evaluate(sample.input);
       return costSum + this.neurons[this.layerCnt - 1].reduce((acc, neuron, i) => { // Add up all output neurons
         return acc + (neuron.getActivation() - sample.output[i]) ** 2;
@@ -152,136 +156,8 @@ export class NeuralCore {
   public getConnections() {
     return this.connections;
   }
-}
 
-export class Neuron {
-  private name: string;
-
-  private activation: number;
-  private inputs: Connection[] = [];
-  private outputs: Connection[] = [];
-
-  // The derivation of C with respect to z
-  private sigma: number;
-  private isInput: boolean = false;
-  private isCalculated: boolean = false;
-  private isBias: boolean = false;
-
-  constructor(name: string, isBias = false) {
-    this.name = name;
-    this.isBias = isBias;
-  };
-
-  public toString() {
-    return name;
-  }
-
-  public setAsInputNeuron(activation: number) {
-    this.isInput = true;
-    this.activation = activation;
-    this.inputs = null;
-  }
-
-  public setInput(activation: number) {
-    if (!this.isInput) {
-      throw 'Cannot set activation of non-input neuron';
-    }
-
-    this.activation = activation;
-  }
-
-  public setSigma(sigma: number) {
-    this.sigma = sigma;
-  }
-
-  public addInput(input: Connection) {
-    this.inputs.push(input);
-  };
-
-  public addOutput(output: Connection) {
-    this.outputs.push(output);
-  }
-
-  public getOutputs(): Connection[] {
-    return this.outputs;
-  }
-
-  public reset() {
-    this.isCalculated = false;
-  }
-
-  public getActivation(): number {
-    if (this.isBias) return 1;
-    return this.activation;
-  }
-
-  public getSigma() {
-    return this.sigma;
-  }
-
-  public calculateActivation(): number {
-    if (!this.isInput && !this.isCalculated && !this.isBias) {
-      this.activation = Activations.SIGMOID.output(this.inputs.reduce((acc, currConn) => acc + currConn.calculateValue(), 0));
-      this.isCalculated = true;
-    }
-    return this.getActivation();
-  }
-}
-
-export class Connection {
-  private weight: number = Math.random();
-  private inputNeuron: Neuron;
-  private outputNeuron: Neuron;
-  private sampleWeightChanges: number[] = [];
-
-  constructor(input: Neuron, output: Neuron) {
-    this.inputNeuron = input;
-    this.outputNeuron = output;
-  }
-
-  public addSampleWeightChange(weightChange: number) {
-    this.sampleWeightChanges.push(weightChange);
-  }
-
-  public applyAverageWeight() {
-    const change = (this.sampleWeightChanges.reduce((acc, val) => acc + val, 0) / this.sampleWeightChanges.length);
-    this.weight += change;
-    this.sampleWeightChanges = [];
-  }
-
-  public getWeight() {
-    return this.weight;
-  }
-
-  public calculateValue() {
-    return this.weight * this.inputNeuron.calculateActivation();
-  }
-
-  public getOutputNeuron() {
-    return this.outputNeuron;
-  }
-
-  public getInputNeuron() {
-    return this.inputNeuron;
-  }
-}
-
-export class Activations {
-  public static SIGMOID = {
-    output: (x: number): number => 1 / (1 + Math.exp(-x)),
-    der: (x: number): number => {
-      let output = Activations.SIGMOID.output(x);
-      return output * (1 - output);
-    }
-  };
-}
-
-export class TrainSample {
-  public input: number[];
-  public output: number[];
-
-  constructor(input: number[], output: number[]) {
-    this.input = input;
-    this.output = output;
+  public getInputSize() {
+    return this.inputSize;
   }
 }

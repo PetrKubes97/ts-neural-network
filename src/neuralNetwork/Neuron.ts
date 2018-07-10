@@ -1,0 +1,80 @@
+import { Connection } from "./Connection";
+import { Activations } from "./HelperClasses";
+
+export class Neuron {
+  private name: string;
+
+  private activation: number;
+  private inputs: Connection[] = [];
+  private outputs: Connection[] = [];
+
+  // The derivation of C with respect to z
+  private sigma: number;
+  private isInput: boolean = false;
+  private isCalculated: boolean = false;
+  private isBias: boolean = false;
+
+  constructor(name: string, isBias = false) {
+    this.name = name;
+    this.isBias = isBias;
+  };
+
+  public toString() {
+    return this.name;
+  }
+
+  public getIsBias() {
+    return this.isBias;
+  }
+
+  public setAsInputNeuron(activation: number) {
+    this.isInput = true;
+    this.activation = activation;
+    this.inputs = null;
+  }
+
+  public setInput(activation: number) {
+    if (!this.isInput) {
+      throw 'Cannot set activation of non-input neuron';
+    }
+
+    this.activation = activation;
+  }
+
+  public setSigma(sigma: number) {
+    this.sigma = sigma;
+  }
+
+  public addInput(input: Connection) {
+    this.inputs.push(input);
+  };
+
+  public addOutput(output: Connection) {
+    this.outputs.push(output);
+  }
+
+  public getOutputs(): Connection[] {
+    return this.outputs;
+  }
+
+  public reset() {
+    this.isCalculated = false;
+  }
+
+  public getActivation(): number {
+    if (this.isBias) this.activation = 1;
+    return this.activation;
+  }
+
+  public getSigma() {
+    return this.sigma;
+  }
+
+  public calculateActivation(): number {
+    if (!this.isInput && !this.isCalculated && !this.isBias) {
+      this.activation = Activations.SIGMOID.output(this.inputs.reduce((acc, currConn) => acc + currConn.calculateValue(), 0));
+      this.isCalculated = true;
+    }
+    return this.getActivation();
+  }
+}
