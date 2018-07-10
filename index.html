@@ -10,16 +10,48 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
     crossorigin="anonymous">
   <script src="./dist/main.js"></script>
-  
+
   <title>Neural network visualized</title>
 </head>
 
 <body>
   <div class="container mt-3">
-      <h1>Neural network visualized</h1>
-      <p class="lead">Visualization of the simplest possible neural network. :)</p>
-      <div id="controls"></div>
-      <canvas id="content" width="800" height="500" style="border: 5px solid #2E282A"></canvas>
+    <h1>Neural network visualized</h1>
+    <p class="lead">Visualization of the simplest possible neural network. :)</p>
+    <hr>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-4">
+          <h5>Input values</h5>
+          <div id="input-controls"></div>
+        </div>
+        <div class="col-md-4">
+          <h5>Network size</h5>
+          <div id="network-size-control">
+            Number of layers: <input type="number" name="layers" min="1" max="10" value="3" onchange="numOflayersChange(this.value)">
+            <div id="layer-controls"></div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <h5>Train</h5>
+          Training rate: <input type="number" name="rate" min="0" max="10" value="1"><br>
+          Number of iterations: <input type="number" name="rate" min="0" max="1000000" value="5000"><br>
+          Current iteration: TODO<br>
+        </div>
+      </div>
+      <hr>
+      <div class="row mb-3">
+          <div class="col-md-auto">
+              <button type="button" class="btn btn-primary mr-2" onclick="train()">Train</button>
+              <button type="button" class="btn btn-secondary">Step</button>
+          </div>  
+          <div class="col-md">
+              TODO cost graph
+          </div>  
+      </div>
+    </div>
+
+    <canvas id="content" width="800" height="500" style="border: 5px solid #2E282A"></canvas>
   </div>
 </body>
 

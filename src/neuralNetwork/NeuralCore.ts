@@ -22,6 +22,11 @@ export class NeuralCore {
     this.hiddenLayerSizes = hiddenLayerSizes;
     this.outputSize = outputSize;
     this.layerCnt = hiddenLayerSizes.length + 2;
+
+    // Reset
+    this.neurons = [];
+    this.connections = [];
+
     this.init();
   }
 
