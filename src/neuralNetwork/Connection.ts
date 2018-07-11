@@ -1,7 +1,7 @@
 import { Neuron } from "./Neuron";
 
 export class Connection {
-  private weight: number = Math.random();
+  private weight: number = Math.random() * 10 - 5;
   private inputNeuron: Neuron;
   private outputNeuron: Neuron;
   private sampleWeightChanges: number[] = [];
@@ -15,7 +15,7 @@ export class Connection {
     this.sampleWeightChanges.push(weightChange);
   }
 
-  public applyAverageWeight() {
+  public applyAverageWeightChange() {
     const change = (this.sampleWeightChanges.reduce((acc, val) => acc + val, 0) / this.sampleWeightChanges.length);
     this.weight += change;
     this.sampleWeightChanges = [];

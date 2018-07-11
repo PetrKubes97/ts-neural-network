@@ -9,7 +9,7 @@ export class NeuralCore {
 
   private layerCnt: number;
 
-  private rate = 5;
+  private rate = 1;
 
   private biasNeuron = new Neuron('bias', true);
   private neurons: Neuron[][] = [];
@@ -59,24 +59,7 @@ export class NeuralCore {
     }
 
     // Create the Connections
-    for (let l = 0; l < this.layerCnt - 1; l++) {
-      // For each neuron in the layer add all connections to neurons in the next layer
-      this.connections[l] = [];
-
-      this.neurons[l + 1].forEach(nextNeuron => { // If you wonder why this cycles are switched, it's because of the bias
-        this.neurons[l].forEach(currNeuron => {
-          const connection = new Connection(currNeuron, nextNeuron)
-          currNeuron.addOutput(connection);
-          nextNeuron.addInput(connection);
-          this.connections[l].push(connection);
-        });
-
-        // Add bias neuron to each layer
-        const biasConnection = new Connection(this.biasNeuron, nextNeuron);
-        nextNeuron.addInput(biasConnection);
-        this.connections[l].push(biasConnection);
-      });
-    }
+    this.createConnections(0, this.layerCnt - 1);
   }
 
   public evaluate(input: number[]): number[] {
@@ -149,9 +132,80 @@ export class NeuralCore {
     // Uff, let's hope everything works and apply the magic
     this.connections.forEach((connLayer) => {
       connLayer.forEach((connection) => {
-        connection.applyAverageWeight();
+        connection.applyAverageWeightChange();
       });
     });
+  }
+
+  public addLayer(add: boolean) {
+    if (add) {
+      const newLayerSize = 3;
+      this.hiddenLayerSizes.push(newLayerSize);
+      this.layerCnt++;
+
+      // Create the new neurons
+      this.neurons[this.layerCnt - 2] = [];
+      for (let i = 0; i < newLayerSize; i++) {
+        this.neurons[this.layerCnt - 2][i] = new Neuron(`Neuron${this.layerCnt - 2}${i}`);
+      }
+
+      // Recreate the last layer
+      this.neurons[this.layerCnt - 1] = [];
+      for (let i = 0; i < this.outputSize; i++) {
+        this.neurons[this.layerCnt - 1][i] = new Neuron(`Neuron${this.layerCnt - 1}${i}`);
+      }
+
+      // Recreate all necessary connections
+      this.createConnections(this.layerCnt - 3, this.layerCnt - 1);
+    } else {
+      if (this.layerCnt == 2) {
+        return;
+      }
+
+      this.hiddenLayerSizes.pop();
+      this.layerCnt--;
+      this.neurons.pop();
+      this.connections.pop();
+
+      // Recreate the last layer
+      this.neurons[this.layerCnt - 1] = [];
+      for (let i = 0; i < this.outputSize; i++) {
+        this.neurons[this.layerCnt - 1][i] = new Neuron(`Neuron${this.layerCnt - 1}${i}`);
+      }
+
+      // Recreate all necessary connections
+      this.createConnections(this.layerCnt - 2, this.layerCnt - 1);
+    }
+  }
+
+  public reset() {
+    this.createConnections(0, this.layerCnt-1);
+  }
+
+  private createConnections(firstLayer, lastLayer) {
+    for (let l = firstLayer; l < lastLayer; l++) {
+      // For each neuron in the layer add all connections to neurons in the next layer
+      this.connections[l] = [];
+
+      // Reset input & outputs
+      this.neurons[l + 1].forEach(nextNeuron => {nextNeuron.resetInputs()});
+      this.neurons[l].forEach(nextNeuron => {nextNeuron.resetOutputs()});
+
+
+      this.neurons[l + 1].forEach(nextNeuron => { // If you wonder why this cycles are switched, it's because of the bias
+        this.neurons[l].forEach(currNeuron => {
+          const connection = new Connection(currNeuron, nextNeuron)
+          currNeuron.addOutput(connection);
+          nextNeuron.addInput(connection);
+          this.connections[l].push(connection);
+        });
+
+        // Add bias neuron to each layer
+        const biasConnection = new Connection(this.biasNeuron, nextNeuron);
+        nextNeuron.addInput(biasConnection);
+        this.connections[l].push(biasConnection);
+      });
+    }
   }
 
   public getNeurons() {
@@ -165,4 +219,9 @@ export class NeuralCore {
   public getInputSize() {
     return this.inputSize;
   }
+
+  public getLayerCnt() {
+    return this.layerCnt;
+  }
+
 }

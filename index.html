@@ -28,8 +28,12 @@
         <div class="col-md-4">
           <h5>Network size</h5>
           <div id="network-size-control">
-            Number of layers: <input type="number" name="layers" min="1" max="10" value="3" onchange="numOflayersChange(this.value)">
-            <div id="layer-controls"></div>
+            Number of layers: <b id="layer-cnt">3</b> 
+            <div class="btn-group" role="group">
+              <button type="button" class="btn btn-secondary btn-sm" onclick="addOrRemoveLayer(false)">-</button>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="addOrRemoveLayer(true)">+</button>
+            </div>
+            <div id="layer-controls" class="mt-2"></div>
           </div>
         </div>
         <div class="col-md-4">
@@ -42,11 +46,12 @@
       <hr>
       <div class="row mb-3">
           <div class="col-md-auto">
-              <button type="button" class="btn btn-primary mr-2" onclick="train()">Train</button>
-              <button type="button" class="btn btn-secondary">Step</button>
+              <button type="button" class="btn btn-primary mr-2" onclick="train(1000)">Train</button>
+              <button type="button" class="btn btn-secondary" onclick="train(1)">Step</button>
+              <button type="button" class="btn btn-danger" onclick="reset()">Reset</button>
           </div>  
           <div class="col-md">
-              TODO cost graph
+              Cost: <b id="cost"></b>
           </div>  
       </div>
     </div>
