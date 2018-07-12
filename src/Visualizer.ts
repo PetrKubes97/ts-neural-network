@@ -44,7 +44,7 @@ export class Visualizer {
         const x = leftMargin * (1 + lIdx);
         const y = topMargin * (1 + nIdx);
 
-        const drawableNeuron = new DrawableNeuron(x, y, neuron.getActivation(), neuron.toString());
+        const drawableNeuron = new DrawableNeuron(x, y, neuron.getActivation(), neuron.getName());
         drawableNeurons.push(drawableNeuron);
       });
 
@@ -68,11 +68,11 @@ export class Visualizer {
         const inputNName =
           (connection.getInputNeuron().getIsBias()) ?
             `bias${lIdx}` :
-            connection.getInputNeuron().toString();
+            connection.getInputNeuron().getName();
 
         this.drawConnection(
           drawableNameMap.get(inputNName),
-          drawableNameMap.get(connection.getOutputNeuron().toString()),
+          drawableNameMap.get(connection.getOutputNeuron().getName()),
           connection.getWeight()
         );
       });

@@ -9,6 +9,7 @@
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
     crossorigin="anonymous">
+  <link rel="stylesheet" href="main.css">
   <script src="./dist/main.js"></script>
 
   <title>Neural network visualized</title>
@@ -38,16 +39,16 @@
         </div>
         <div class="col-md-4">
           <h5>Train</h5>
-          Training rate: <input type="number" name="rate" min="0" max="10" value="1"><br>
-          Number of iterations: <input type="number" name="rate" min="0" max="1000000" value="5000"><br>
+          Training rate: <input id="rate-input" type="number" name="rate" min="0" max="10" value="1"><br>
+          Number of iterations: <input id="iters-input" type="number" name="rate" min="0" max="1000000" value="5000"><br>
           Current iteration: TODO<br>
         </div>
       </div>
       <hr>
       <div class="row mb-3">
           <div class="col-md-auto">
-              <button type="button" class="btn btn-primary mr-2" onclick="train(1000)">Train</button>
-              <button type="button" class="btn btn-secondary" onclick="train(1)">Step</button>
+              <button type="button" class="btn btn-primary mr-2" onclick="train(true)">Train</button>
+              <button type="button" class="btn btn-secondary" onclick="train(false)">Step</button>
               <button type="button" class="btn btn-danger" onclick="reset()">Reset</button>
           </div>  
           <div class="col-md">
@@ -56,7 +57,7 @@
       </div>
     </div>
 
-    <canvas id="content" width="800" height="500" style="border: 5px solid #2E282A"></canvas>
+    <canvas id="content" width="1200" height="600" style="border: 5px solid #2E282A; margin-bottom: 70px;"></canvas>
   </div>
 </body>
 

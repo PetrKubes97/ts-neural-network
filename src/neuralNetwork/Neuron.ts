@@ -5,8 +5,8 @@ export class Neuron {
   private name: string;
 
   private activation: number;
-  private inputs: Connection[];
-  private outputs: Connection[];
+  private inputs: Connection[] = [];
+  private outputs: Connection[] = [];
 
   // The derivation of C with respect to z
   private sigma: number;
@@ -19,7 +19,7 @@ export class Neuron {
     this.isBias = isBias;
   };
 
-  public toString() {
+  public getName() {
     return this.name;
   }
 
@@ -49,12 +49,24 @@ export class Neuron {
     this.inputs.push(input);
   };
 
+  public getInputs(): Connection[] {
+    return this.inputs;
+  }
+
   public addOutput(output: Connection) {
     this.outputs.push(output);
   }
 
   public getOutputs(): Connection[] {
     return this.outputs;
+  }
+
+  public setOutputs(connections: Connection[]) {
+    this.outputs = connections;
+  }
+
+  public setInputs(connections: Connection[]) {
+    this.inputs = connections;
   }
 
   public resetInputs() {

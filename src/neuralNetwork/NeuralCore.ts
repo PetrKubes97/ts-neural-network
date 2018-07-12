@@ -83,6 +83,10 @@ export class NeuralCore {
   }
 
   public getCost(): number {
+    if (this.trainSamples.length == 0) {
+      return 0;
+    }
+
     const costSum = this.trainSamples.reduce((costSum, sample) => { // Add up all samples
       this.evaluate(sample.input);
       return costSum + this.neurons[this.layerCnt - 1].reduce((acc, neuron, i) => { // Add up all output neurons
@@ -137,23 +141,17 @@ export class NeuralCore {
     });
   }
 
-  public addLayer(add: boolean) {
+  public addOrRemoveLayer(add: boolean) {
     if (add) {
       const newLayerSize = 3;
       this.hiddenLayerSizes.push(newLayerSize);
       this.layerCnt++;
 
       // Create the new neurons
-      this.neurons[this.layerCnt - 2] = [];
-      for (let i = 0; i < newLayerSize; i++) {
-        this.neurons[this.layerCnt - 2][i] = new Neuron(`Neuron${this.layerCnt - 2}${i}`);
-      }
+      this.createLayerOfNeurons(this.layerCnt - 2, newLayerSize);
 
       // Recreate the last layer
-      this.neurons[this.layerCnt - 1] = [];
-      for (let i = 0; i < this.outputSize; i++) {
-        this.neurons[this.layerCnt - 1][i] = new Neuron(`Neuron${this.layerCnt - 1}${i}`);
-      }
+      this.createLayerOfNeurons(this.layerCnt - 1, this.outputSize);
 
       // Recreate all necessary connections
       this.createConnections(this.layerCnt - 3, this.layerCnt - 1);
@@ -168,18 +166,116 @@ export class NeuralCore {
       this.connections.pop();
 
       // Recreate the last layer
-      this.neurons[this.layerCnt - 1] = [];
-      for (let i = 0; i < this.outputSize; i++) {
-        this.neurons[this.layerCnt - 1][i] = new Neuron(`Neuron${this.layerCnt - 1}${i}`);
-      }
+      this.createLayerOfNeurons(this.layerCnt - 1, this.outputSize);
 
       // Recreate all necessary connections
       this.createConnections(this.layerCnt - 2, this.layerCnt - 1);
     }
   }
 
+  // This function is very long and ugly, I dont want to simply rebuild the network because I want to keep the weights
+  public addOrRemoveNeuron(add: boolean, layerIdx: number) {
+    const isInput = layerIdx == 0;
+    const isOutput = layerIdx == this.layerCnt - 1;
+    const isHidden = !isInput && !isOutput;
+    
+    const sizeChange = (add) ? 1 : -1
+
+    if (isHidden) {
+      this.hiddenLayerSizes[layerIdx - 1] += sizeChange;
+    }
+    else if (isInput) {
+      this.inputSize += sizeChange;
+      this.trainSamples = [];
+    } else {
+      this.outputSize += sizeChange;
+      this.trainSamples = [];
+    }
+
+    if (add) {
+      let newNeuronIdx;
+
+      if (isHidden) {
+        newNeuronIdx = this.hiddenLayerSizes[layerIdx - 1] - 1;
+      }
+      else if (isInput) {
+        newNeuronIdx = this.inputSize - 1;
+      } else {
+        newNeuronIdx = this.outputSize - 1;
+      }  
+
+      const newNeuron = new Neuron(`Neuron${layerIdx}${newNeuronIdx}`);
+      this.neurons[layerIdx][newNeuronIdx] = newNeuron;
+
+      if (isInput)
+        newNeuron.setAsInputNeuron(0);
+
+      //// Add connections from the prev layer
+      if (!isInput) {
+        this.neurons[layerIdx - 1].forEach((neuron) => {
+          const connection = new Connection(neuron, newNeuron);
+          neuron.addOutput(connection);
+          newNeuron.addInput(connection);
+          this.connections[layerIdx - 1].push(connection);
+        });
+        // Dont forget the bias
+        const connection = new Connection(this.biasNeuron, newNeuron);
+        newNeuron.addInput(connection);
+        this.connections[layerIdx - 1].push(connection);
+      }
+
+      if (!isOutput) {
+        //// Add connections to the next layer
+        this.neurons[layerIdx + 1].forEach((neuron) => {
+          const connection = new Connection(newNeuron, neuron);
+          neuron.addInput(connection);
+          this.connections[layerIdx].push(connection);
+        });
+      }
+    } else {
+      const removedNeuron = this.neurons[layerIdx].pop();
+      // Remove outputs from the prev layer
+      if (!isInput) {
+        this.neurons[layerIdx - 1].forEach((neuron) => {
+          neuron.setOutputs(neuron.getOutputs().filter((connection) => {
+            return connection.getOutputNeuron().getName() != removedNeuron.getName();
+          }));
+        });
+      }
+
+      // Remove input in the next layer
+      if (!isOutput) {
+        this.neurons[layerIdx + 1].forEach((neuron) => {
+          neuron.setInputs(neuron.getInputs().filter((connection) => {
+            return connection.getInputNeuron().getName() != removedNeuron.getName();
+          }));
+        });
+      }
+
+      // Remove the unused connections
+      if (!isInput) {
+        this.connections[layerIdx-1] = this.connections[layerIdx-1].filter((connection: Connection) => {
+          return connection.getOutputNeuron().getName() != removedNeuron.getName();
+        });
+      }
+
+      if (!isOutput) {
+        this.connections[layerIdx] = this.connections[layerIdx].filter((connection: Connection) => {
+          return connection.getInputNeuron().getName() != removedNeuron.getName();
+        });
+      }
+    }
+  }
+
   public reset() {
-    this.createConnections(0, this.layerCnt-1);
+    this.createConnections(0, this.layerCnt - 1);
+  }
+
+  private createLayerOfNeurons(layerIdx: number, layerSize: number) {
+    this.neurons[layerIdx] = [];
+    for (let i = 0; i < layerSize; i++) {
+      this.neurons[layerIdx][i] = new Neuron(`Neuron${layerIdx}${i}`);
+    }
   }
 
   private createConnections(firstLayer, lastLayer) {
@@ -188,8 +284,8 @@ export class NeuralCore {
       this.connections[l] = [];
 
       // Reset input & outputs
-      this.neurons[l + 1].forEach(nextNeuron => {nextNeuron.resetInputs()});
-      this.neurons[l].forEach(nextNeuron => {nextNeuron.resetOutputs()});
+      this.neurons[l + 1].forEach(nextNeuron => { nextNeuron.resetInputs() });
+      this.neurons[l].forEach(nextNeuron => { nextNeuron.resetOutputs() });
 
 
       this.neurons[l + 1].forEach(nextNeuron => { // If you wonder why this cycles are switched, it's because of the bias
@@ -224,4 +320,11 @@ export class NeuralCore {
     return this.layerCnt;
   }
 
+  public getHiddenLayerSizes() {
+    return this.hiddenLayerSizes;
+  }
+
+  public setRate(newRate: number) {
+    this.rate = newRate;
+  }
 }
