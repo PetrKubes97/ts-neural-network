@@ -1,5 +1,10 @@
+export interface Activation {
+  der(x: number): number;
+  output(x: number): number;
+}
+
 export class Activations {
-  public static SIGMOID = {
+  public static SIGMOID: Activation = {
     output: (x: number): number => 1 / (1 + Math.exp(-x)),
     der: (x: number): number => {
       let output = Activations.SIGMOID.output(x);

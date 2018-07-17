@@ -10,6 +10,7 @@ export class NeuralCore {
   private layerCnt: number;
 
   private rate = 1;
+  private lambda = 0.003;
 
   private biasNeuron = new Neuron('bias', true);
   private neurons: Neuron[][] = [];
@@ -94,7 +95,11 @@ export class NeuralCore {
       }, 0);
     }, 0);
 
-    return 1 / 2 * costSum * (1 / this.trainSamples.length);
+    return 1 / 2 * costSum * (1 / this.trainSamples.length) + 
+      1 / 2 * this.lambda * this.connections.reduce( // Regularization
+        (prev, connLayer: Connection[]) => {
+          return prev + connLayer.reduce((acc, conn) => acc + conn.getWeight(), 0) ** 2
+        }, 0) * (1 / this.getNumberOfConnections());
   }
 
   public train() {
@@ -126,7 +131,8 @@ export class NeuralCore {
           const weightChange =
             connection.getOutputNeuron().getSigma() *
             connection.getInputNeuron().getActivation() *
-            this.rate;
+            this.rate - 
+            this.lambda * connection.getWeight() * (1 / this.getNumberOfConnections()); // Regularization
 
           connection.addSampleWeightChange(weightChange);
         });
@@ -302,6 +308,10 @@ export class NeuralCore {
         this.connections[l].push(biasConnection);
       });
     }
+  }
+
+  private getNumberOfConnections():number {
+    return this.connections.reduce((acc, conn) => acc + conn.length, 0);
   }
 
   public getNeurons() {
