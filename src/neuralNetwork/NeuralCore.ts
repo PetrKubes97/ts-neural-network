@@ -9,8 +9,10 @@ export class NeuralCore {
 
   private layerCnt: number;
 
+  private iterCnt = 0;
+
   private rate = 1;
-  private lambda = 0.003;
+  private lambda = 0.001;
 
   private biasNeuron = new Neuron('bias', true);
   private neurons: Neuron[][] = [];
@@ -95,7 +97,7 @@ export class NeuralCore {
       }, 0);
     }, 0);
 
-    return 1 / 2 * costSum * (1 / this.trainSamples.length) + 
+    return 1 / 2 * costSum * (1 / this.trainSamples.length) +
       1 / 2 * this.lambda * this.connections.reduce( // Regularization
         (prev, connLayer: Connection[]) => {
           return prev + connLayer.reduce((acc, conn) => acc + conn.getWeight(), 0) ** 2
@@ -131,7 +133,7 @@ export class NeuralCore {
           const weightChange =
             connection.getOutputNeuron().getSigma() *
             connection.getInputNeuron().getActivation() *
-            this.rate - 
+            this.rate -
             this.lambda * connection.getWeight() * (1 / this.getNumberOfConnections()); // Regularization
 
           connection.addSampleWeightChange(weightChange);
@@ -145,6 +147,8 @@ export class NeuralCore {
         connection.applyAverageWeightChange();
       });
     });
+
+    this.iterCnt++;
   }
 
   public addOrRemoveLayer(add: boolean) {
@@ -184,7 +188,7 @@ export class NeuralCore {
     const isInput = layerIdx == 0;
     const isOutput = layerIdx == this.layerCnt - 1;
     const isHidden = !isInput && !isOutput;
-    
+
     const sizeChange = (add) ? 1 : -1
 
     if (isHidden) {
@@ -208,7 +212,7 @@ export class NeuralCore {
         newNeuronIdx = this.inputSize - 1;
       } else {
         newNeuronIdx = this.outputSize - 1;
-      }  
+      }
 
       const newNeuron = new Neuron(`Neuron${layerIdx}${newNeuronIdx}`);
       this.neurons[layerIdx][newNeuronIdx] = newNeuron;
@@ -260,7 +264,7 @@ export class NeuralCore {
 
       // Remove the unused connections
       if (!isInput) {
-        this.connections[layerIdx-1] = this.connections[layerIdx-1].filter((connection: Connection) => {
+        this.connections[layerIdx - 1] = this.connections[layerIdx - 1].filter((connection: Connection) => {
           return connection.getOutputNeuron().getName() != removedNeuron.getName();
         });
       }
@@ -310,7 +314,7 @@ export class NeuralCore {
     }
   }
 
-  private getNumberOfConnections():number {
+  private getNumberOfConnections(): number {
     return this.connections.reduce((acc, conn) => acc + conn.length, 0);
   }
 
@@ -326,6 +330,10 @@ export class NeuralCore {
     return this.inputSize;
   }
 
+  public getOutputSize() {
+    return this.outputSize;
+  }
+
   public getLayerCnt() {
     return this.layerCnt;
   }
@@ -336,5 +344,9 @@ export class NeuralCore {
 
   public setRate(newRate: number) {
     this.rate = newRate;
+  }
+
+  public getIteration() {
+    return this.iterCnt;
   }
 }

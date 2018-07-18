@@ -18,42 +18,62 @@
 <body>
   <div class="container mt-3">
     <h1>Neural network visualized</h1>
-    <p class="lead">Visualization of the simplest possible neural network. :)</p>
+    <p class="lead">Visualization of a simple neural network for strictly educational purposes.</p>
     <hr>
-    <div class="container-fluid">
+    <div class="container-fluid" id="controls">
       <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-3">
           <h5>Input values</h5>
           <div id="input-controls"></div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
           <h5>Network size</h5>
-          <div id="network-size-control">
-            Number of layers: <b id="layer-cnt">3</b> 
-            <div class="btn-group" role="group">
-              <button type="button" class="btn btn-secondary btn-sm" onclick="addOrRemoveLayer(false)">-</button>
-              <button type="button" class="btn btn-secondary btn-sm" onclick="addOrRemoveLayer(true)">+</button>
-            </div>
-            <div id="layer-controls" class="mt-2"></div>
+          <table id="layer-controls">
+          </table>
+        </div>
+        <div class="col-md-3">
+          <h5>Learning settings</h5>
+          <div class="row">
+            <label for="rate-input" class="control-label col-8">Learning rate:</label>
+            <input class="form-control form-control-sm col-4" id="rate-input" type="number" name="rate" min="0" max="10" step="0.1" value="1">
+          </div>
+          <div class="row">
+            <label for="regularization-input" class="col-8">Regularization:</label>
+            <select class="form-control form-control-sm col-4" id="regularization-input">
+              <option value="none">None</option>
+              <option value="L2">L2</option>
+            </select>
+          </div>
+          <div class="row">
+            <label for="regularization-input" class="col-8">Regularization rate:</label>
+            <input class="form-control form-control-sm col-4" id="regularization-rate-input" type="number" name="rate" min="0" max="10"
+              value="1">
           </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
           <h5>Train</h5>
-          Training rate: <input id="rate-input" type="number" name="rate" min="0" max="10" value="1"><br>
-          Number of iterations: <input id="iters-input" type="number" name="rate" min="0" max="1000000" value="5000"><br>
-          Current iteration: TODO<br>
+          <div class="row">
+            <label for="iters-input" class="col-8">Num. of iterations:</label>
+            <input class="form-control form-control-sm col-4" id="iters-input" type="number" name="rate" min="0" max="20000" value="5000"
+              step="1000">
+          </div>
+          <div class="row">
+            <label for="iter-output" class="col-8">Current iteration:</label>
+            <b id="iter-output" class="col-4">0</b>
+          </div>
         </div>
       </div>
       <hr>
       <div class="row mb-3">
-          <div class="col-md-auto">
-              <button type="button" class="btn btn-primary mr-2" onclick="train(true)">Train</button>
-              <button type="button" class="btn btn-secondary" onclick="train(false)">Step</button>
-              <button type="button" class="btn btn-danger" onclick="reset()">Reset</button>
-          </div>  
-          <div class="col-md">
-              Cost: <b id="cost"></b>
-          </div>  
+        <div class="col-md-auto">
+          <button type="button" class="btn btn-primary mr-2" onclick="train(true)">Train</button>
+          <button type="button" class="btn btn-secondary" onclick="train(false)">Step</button>
+          <button type="button" class="btn btn-danger" onclick="reset()">Reset</button>
+        </div>
+        <div class="col-md">
+          Cost:
+          <b id="cost"></b>
+        </div>
       </div>
     </div>
 

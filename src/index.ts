@@ -18,7 +18,10 @@ import { NeuralCore } from './neuralNetwork/NeuralCore';
 (window as any).addOrRemoveNeuron = (add: boolean, layerIdx: number) => {
   neuralCore.addOrRemoveNeuron(add, layerIdx);
   if (layerIdx == 0) {
-    input.push(1);
+    if (add)
+      input.push(1);
+    else
+      input.pop();
   }
   neuralCore.evaluate(input);
 
@@ -30,7 +33,7 @@ import { NeuralCore } from './neuralNetwork/NeuralCore';
   let iters = multipleIters ? Number.parseInt(itersInput.value) : 1;
   neuralCore.setRate(Number.parseFloat(rateInput.value));
 
-  for (let i=0;i<iters;i++) {
+  for (let i = 0; i < iters; i++) {
     neuralCore.train();
   }
 
@@ -61,8 +64,8 @@ let outputSize = 4;
 let layerControls: HTMLElement;
 let inputControls: HTMLElement;
 
-let layerCnt: HTMLElement;
 let cost: HTMLElement;
+let iter: HTMLElement;
 
 let rateInput: HTMLInputElement;
 let itersInput: HTMLInputElement;
@@ -71,7 +74,7 @@ const main = () => {
   const content: HTMLCanvasElement = document.getElementById('content') as HTMLCanvasElement;
   inputControls = document.getElementById('input-controls');
   layerControls = document.getElementById('layer-controls');
-  layerCnt = document.getElementById('layer-cnt');
+  iter = document.getElementById('iter-output');
   cost = document.getElementById('cost');
   rateInput = document.getElementById('rate-input') as HTMLInputElement;
   itersInput = document.getElementById('iters-input') as HTMLInputElement;
@@ -84,9 +87,9 @@ const main = () => {
 const initCore = () => {
   neuralCore = new NeuralCore(inputSize, hiddenSizes, outputSize);
 
-  neuralCore.addTrainingSet([1,0,0,0], [0,1,0,0]);
-  neuralCore.addTrainingSet([0,1,0,0], [0,0,1,0]);
-  neuralCore.addTrainingSet([0,0,1,0], [0,0,0,1]);
+  neuralCore.addTrainingSet([1, 0, 0, 0], [0, 1, 0, 0]);
+  neuralCore.addTrainingSet([0, 1, 0, 0], [0, 0, 1, 0]);
+  neuralCore.addTrainingSet([0, 0, 1, 0], [0, 0, 0, 1]);
 
   // Set default values
   input = new Array(neuralCore.getInputSize());
@@ -98,34 +101,52 @@ const initCore = () => {
 }
 
 const updateUI = () => {
-  let content = '<table>';
-  content += `<tr><td align='right'>Input size: <b>${inputSize}</b></td><td>
-    <div class="btn-group" role="group">
-      <button type="button" class="btn btn-secondary btn-sm" onclick="addOrRemoveNeuron(false, 0)">-</button>
-      <button type="button" class="btn btn-secondary btn-sm" onclick="addOrRemoveNeuron(true, 0)">+</button>
-    </div></td></tr>`;
-  
+  let content = addLayerControlRow(
+    'Layers',
+    neuralCore.getLayerCnt().toString(),
+    'addOrRemoveLayer(true)',
+    'addOrRemoveLayer(false)'
+  );
+
+
+  content += addLayerControlRow(
+    'Input size',
+    neuralCore.getInputSize().toString(),
+    'addOrRemoveNeuron(true, 0)',
+    'addOrRemoveNeuron(false, 0)'
+  );
+
   for (let i = 0; i < neuralCore.getLayerCnt() - 2; i++) {
-    content += `<tr><td align='right'>Hidden layer size: <b>${neuralCore.getHiddenLayerSizes()[i]}</b></td><td>
-      <div class="btn-group" role="group">
-        <button type="button" class="btn btn-secondary btn-sm" onclick="addOrRemoveNeuron(false, ${i+1})">-</button>
-        <button type="button" class="btn btn-secondary btn-sm" onclick="addOrRemoveNeuron(true, ${i+1})">+</button>
-      </div></td></tr>`;
+    content += addLayerControlRow(
+      'Hidden layer size',
+      neuralCore.getHiddenLayerSizes()[i].toString(),
+      `addOrRemoveNeuron(true, ${i + 1})`,
+      `addOrRemoveNeuron(false, ${i + 1})`
+    );
   }
-  content += `<tr><td align='right'>Output size: <b>${outputSize}</b></td><td>
-    <div class="btn-group" role="group">
-      <button type="button" class="btn btn-secondary btn-sm" onclick="addOrRemoveNeuron(false, ${neuralCore.getLayerCnt()-1})">-</button>
-      <button type="button" class="btn btn-secondary btn-sm" onclick="addOrRemoveNeuron(true, ${neuralCore.getLayerCnt()-1})">+</button>
-    </div></td></tr>`;
-  content += '</table>';
+
+  content += addLayerControlRow(
+    'Output size',
+    neuralCore.getOutputSize().toString(),
+    `addOrRemoveNeuron(true, ${neuralCore.getLayerCnt() - 1})`,
+    `addOrRemoveNeuron(false, ${neuralCore.getLayerCnt() - 1})`
+  );
 
   layerControls.innerHTML = content;
 
   inputControls.innerHTML = '';
   for (let i = 0; i < neuralCore.getInputSize(); i++) {
-    inputControls.innerHTML += `Neuron ${i}: <input style="position: relative; top: 5px;" type="range" min="0" max="1" value="1" step="0.05" id="slider${i}" oninput="slide(${i}, this.value);"><br>`;
+    inputControls.innerHTML += `<label>Neuron ${i}:</label> <input style="position: relative; top: 5px;" type="range" min="0" max="1" value="1" step="0.05" id="slider${i}" oninput="slide(${i}, this.value);"><br>`;
   }
 
-  layerCnt.innerText = neuralCore.getLayerCnt().toString();
+  iter.innerHTML = neuralCore.getIteration().toString();
   cost.innerHTML = neuralCore.getCost().toString();
+}
+
+const addLayerControlRow = (label: string, size: string, onclickPos: string, onclickNeg: string): string => {
+  return `<tr><td align='right'><label>${label}:</label><b style="margin: auto 6px">${size}</b></td><td>
+  <div class="btn-group" role="group">
+    <button type="button" class="btn btn-secondary btn-sm" onclick="${onclickNeg}">-</button>
+    <button type="button" class="btn btn-secondary btn-sm" onclick="${onclickPos}">+</button>
+  </div></td></tr>`;
 }

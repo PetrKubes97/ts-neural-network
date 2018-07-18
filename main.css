@@ -1,4 +1,12 @@
-b {
-  padding-right: 10px;
-  padding-left: 5px;
+#controls label {
+  font-size: 0.9em;
+  margin: auto 0px;
+}
+
+#controls input {
+  margin: 5px 0px;
+}
+
+#controls b {
+  margin: auto 0px;
 }
