@@ -1,5 +1,6 @@
 import { Visualizer } from './Visualizer';
 import { NeuralCore } from './neuralNetwork/NeuralCore';
+import { Regularizations } from './neuralNetwork/HelperObjects';
 
 (window as any).slide = (i: number, value: number) => {
   input[i] = value;
@@ -33,6 +34,21 @@ import { NeuralCore } from './neuralNetwork/NeuralCore';
   let iters = multipleIters ? Number.parseInt(itersInput.value) : 1;
   neuralCore.setRate(Number.parseFloat(rateInput.value));
 
+  // Regularization
+  switch (regTypeInput.value) {
+    case "L1":
+      neuralCore.setRegularizationType(Regularizations.L1);
+      break;
+    case "L2":
+      neuralCore.setRegularizationType(Regularizations.L2);
+      break;
+    case "none":
+      neuralCore.setRegularizationType(Regularizations.NONE);
+      break;
+  }
+
+  neuralCore.setRegularizationRate(Number.parseFloat(regRateInput.value));
+
   for (let i = 0; i < iters; i++) {
     neuralCore.train();
   }
@@ -48,7 +64,6 @@ import { NeuralCore } from './neuralNetwork/NeuralCore';
   updateUI();
   visualizer.draw(neuralCore.getNeurons(), neuralCore.getConnections());
 }
-
 
 window.onload = () => {
   main();
@@ -69,6 +84,8 @@ let iter: HTMLElement;
 
 let rateInput: HTMLInputElement;
 let itersInput: HTMLInputElement;
+let regTypeInput: HTMLInputElement;
+let regRateInput: HTMLInputElement;
 
 const main = () => {
   const content: HTMLCanvasElement = document.getElementById('content') as HTMLCanvasElement;
@@ -78,6 +95,8 @@ const main = () => {
   cost = document.getElementById('cost');
   rateInput = document.getElementById('rate-input') as HTMLInputElement;
   itersInput = document.getElementById('iters-input') as HTMLInputElement;
+  regTypeInput = document.getElementById('regularization-type-input') as HTMLInputElement;
+  regRateInput = document.getElementById('regularization-rate-input') as HTMLInputElement;
 
   visualizer = new Visualizer(content);
 

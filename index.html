@@ -39,15 +39,16 @@
           </div>
           <div class="row">
             <label for="regularization-input" class="col-8">Regularization:</label>
-            <select class="form-control form-control-sm col-4" id="regularization-input">
+            <select class="form-control form-control-sm col-4" id="regularization-type-input">
               <option value="none">None</option>
+              <option value="L1">L1</option>
               <option value="L2">L2</option>
             </select>
           </div>
           <div class="row">
             <label for="regularization-input" class="col-8">Regularization rate:</label>
             <input class="form-control form-control-sm col-4" id="regularization-rate-input" type="number" name="rate" min="0" max="10"
-              value="1">
+              step="0.1" value="0.1">
           </div>
         </div>
         <div class="col-md-3">
@@ -64,13 +65,55 @@
         </div>
       </div>
       <hr>
+      <div class="row">
+        <div class="col-4">
+          <h5>Training set input</h5>
+          <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+          <button type="button" class="btn btn-outline-primary btn-sm mt-3">Apply training data</button>
+        </div>
+        <div class="col-8">
+          <h5>Training set</h5>
+          <div id="training-set-output"></div>
+          <table class="table table-sm table-bordered table-hover">
+            <thead class="thead-dark">
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Neuron 1</th>
+                <th scope="col">Neuron 1</th>
+                <th scope="col">Neuron 1</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">1</th>
+                <td>Mark</td>
+                <td>Otto</td>
+                <td>@mdo</td>
+              </tr>
+              <tr>
+                <th scope="row">2</th>
+                <td>Jacob</td>
+                <td>Thornton</td>
+                <td>@fat</td>
+              </tr>
+              <tr>
+                <th scope="row">3</th>
+                <td>Larry</td>
+                <td>the Bird</td>
+                <td>@twitter</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <hr>
       <div class="row mb-3">
         <div class="col-md-auto">
           <button type="button" class="btn btn-primary mr-2" onclick="train(true)">Train</button>
           <button type="button" class="btn btn-secondary" onclick="train(false)">Step</button>
           <button type="button" class="btn btn-danger" onclick="reset()">Reset</button>
         </div>
-        <div class="col-md">
+        <div class="col-md-auto">
           Cost:
           <b id="cost"></b>
         </div>

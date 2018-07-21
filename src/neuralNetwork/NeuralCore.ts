@@ -1,6 +1,6 @@
 import { Neuron } from "./Neuron";
 import { Connection } from "./Connection";
-import { TrainSample, Activations } from "./HelperClasses";
+import { TrainSample, SIGMOID, Regularizations, L2Reg, getNumberOfConnections, L1Reg } from "./HelperObjects";
 
 export class NeuralCore {
   private inputSize: number;
@@ -13,6 +13,7 @@ export class NeuralCore {
 
   private rate = 1;
   private lambda = 0.001;
+  private regType: Regularizations = Regularizations.NONE;
 
   private biasNeuron = new Neuron('bias', true);
   private neurons: Neuron[][] = [];
@@ -97,11 +98,22 @@ export class NeuralCore {
       }, 0);
     }, 0);
 
+    // Regularization
+    let regCost = 0;
+    switch (this.regType) {
+      case Regularizations.L1:
+        regCost = L1Reg.cost(this.connections);
+        break;
+      case Regularizations.L2:
+        regCost = L2Reg.cost(this.connections);
+        break;
+      case Regularizations.NONE:
+        regCost = 0;
+        break;
+    }
+
     return 1 / 2 * costSum * (1 / this.trainSamples.length) +
-      1 / 2 * this.lambda * this.connections.reduce( // Regularization
-        (prev, connLayer: Connection[]) => {
-          return prev + connLayer.reduce((acc, conn) => acc + conn.getWeight(), 0) ** 2
-        }, 0) * (1 / this.getNumberOfConnections());
+      this.lambda * regCost;
   }
 
   public train() {
@@ -111,7 +123,7 @@ export class NeuralCore {
       // Calculate sigmas of the last layer
       this.neurons[this.layerCnt - 1].forEach((neuron, idx) => {
         const newSigma =
-          (sample.output[idx] - neuron.getActivation()) * Activations.SIGMOID.der(neuron.getActivation());
+          (sample.output[idx] - neuron.getActivation()) * SIGMOID.der(neuron.getActivation());
 
         neuron.setSigma(newSigma);
       });
@@ -122,7 +134,7 @@ export class NeuralCore {
           const newSigma =
             neuron.getOutputs().reduce((acc, connection) => {
               return acc + connection.getOutputNeuron().getSigma() * connection.getWeight();
-            }, 0) * Activations.SIGMOID.der(neuron.getActivation());
+            }, 0) * SIGMOID.der(neuron.getActivation());
           neuron.setSigma(newSigma);
         });
       }
@@ -130,11 +142,25 @@ export class NeuralCore {
       // Accumulate all weight updates
       this.connections.forEach((connLayer) => {
         connLayer.forEach((connection) => {
+
+          let regDer = 0;
+          switch (this.regType) {
+            case Regularizations.L1:
+              regDer = L1Reg.der(connection.getWeight());
+              break;
+            case Regularizations.L2:
+              regDer = L2Reg.der(connection.getWeight(), getNumberOfConnections(this.connections));
+              break;
+            case Regularizations.NONE:
+              regDer = 0;
+              break;
+          }
+
           const weightChange =
             connection.getOutputNeuron().getSigma() *
             connection.getInputNeuron().getActivation() *
             this.rate -
-            this.lambda * connection.getWeight() * (1 / this.getNumberOfConnections()); // Regularization
+            this.lambda * regDer; // Regularization
 
           connection.addSampleWeightChange(weightChange);
         });
@@ -314,10 +340,6 @@ export class NeuralCore {
     }
   }
 
-  private getNumberOfConnections(): number {
-    return this.connections.reduce((acc, conn) => acc + conn.length, 0);
-  }
-
   public getNeurons() {
     return this.neurons;
   }
@@ -348,5 +370,13 @@ export class NeuralCore {
 
   public getIteration() {
     return this.iterCnt;
+  }
+
+  public setRegularizationType(regType: Regularizations) {
+    this.regType = regType;
+  }
+
+  public setRegularizationRate(rate: number) {
+    this.lambda = rate;
   }
 }

@@ -1,5 +1,5 @@
 import { Connection } from "./Connection";
-import { Activations } from "./HelperClasses";
+import { SIGMOID } from "./HelperObjects";
 
 export class Neuron {
   private name: string;
@@ -92,7 +92,7 @@ export class Neuron {
 
   public calculateActivation(): number {
     if (!this.isInput && !this.isCalculated && !this.isBias) {
-      this.activation = Activations.SIGMOID.output(this.inputs.reduce((acc, currConn) => acc + currConn.calculateValue(), 0));
+      this.activation = SIGMOID.output(this.inputs.reduce((acc, currConn) => acc + currConn.calculateValue(), 0));
       this.isCalculated = true;
     }
     return this.getActivation();
