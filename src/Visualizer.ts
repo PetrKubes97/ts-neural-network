@@ -33,7 +33,7 @@ export class Visualizer {
 
   public draw(neurons: Neuron[][], connections: Connection[][]) {
     this.ctx.clearRect(0, 0, this.width, this.height);
-    
+
     const drawableNeurons: DrawableNeuron[] = [];
     const leftMargin = this.width / (neurons.length + 1);
 
@@ -89,12 +89,12 @@ export class Visualizer {
     this.ctx.arc(drawableNeuron.x, drawableNeuron.y, 25, 0, 2 * Math.PI);
     this.ctx.fillStyle = `rgb(255,255,255)`;
     this.ctx.fill();
-    
+
     this.ctx.beginPath();
     if (drawableNeuron.isBias)
       this.ctx.fillStyle = `rgba(46,40,42, 1)`;
     else
-      this.ctx.fillStyle = `rgba(23, 190, 187, ${drawableNeuron.activation})`;
+      this.ctx.fillStyle = `rgba(61, 232, 255, ${drawableNeuron.activation})`;
     this.ctx.strokeStyle = `rgb(46,40,42, 1)`
     this.ctx.lineWidth = 1;
     this.ctx.arc(drawableNeuron.x, drawableNeuron.y, 25, 0, 2 * Math.PI);
@@ -106,14 +106,14 @@ export class Visualizer {
     this.ctx.font = `bold ${height}px serif`;
     const text = Number(drawableNeuron.activation).toFixed(2);
     this.ctx.fillText(
-      text, 
-      drawableNeuron.x - this.ctx.measureText(text).width / 2, 
+      text,
+      drawableNeuron.x - this.ctx.measureText(text).width / 2,
       drawableNeuron.y + height / 3);
   }
 
   private drawConnection(inputNeuron: DrawableNeuron, outputNeuron: DrawableNeuron, weight: number) {
     this.ctx.beginPath();
-    this.ctx.lineWidth = (weight > 0) ? 
+    this.ctx.lineWidth = (weight > 0) ?
       Math.log(weight) :
       Math.log(-weight);
     this.ctx.strokeStyle = (weight > 0) ?

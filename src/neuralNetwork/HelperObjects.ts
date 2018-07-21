@@ -3,7 +3,7 @@ import { Connection } from "./Connection";
 export interface Activation {
   der(x: number): number;
   output(x: number): number;
-}
+};
 
 export const SIGMOID: Activation = {
   output: (x: number): number => 1 / (1 + Math.exp(-x)),

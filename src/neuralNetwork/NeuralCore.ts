@@ -379,4 +379,12 @@ export class NeuralCore {
   public setRegularizationRate(rate: number) {
     this.lambda = rate;
   }
+
+  public getTrainingSamples() {
+    return this.trainSamples;
+  }
+
+  public setTrainingSamples(samples: TrainSample[]) {
+    this.trainSamples = samples;
+  }
 }

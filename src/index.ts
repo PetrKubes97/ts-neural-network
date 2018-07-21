@@ -1,6 +1,6 @@
 import { Visualizer } from './Visualizer';
 import { NeuralCore } from './neuralNetwork/NeuralCore';
-import { Regularizations } from './neuralNetwork/HelperObjects';
+import { Regularizations, TrainSample } from './neuralNetwork/HelperObjects';
 
 (window as any).slide = (i: number, value: number) => {
   input[i] = value;
@@ -58,6 +58,20 @@ import { Regularizations } from './neuralNetwork/HelperObjects';
   visualizer.draw(neuralCore.getNeurons(), neuralCore.getConnections());
 }
 
+(window as any).setTrainingData = () => {
+  try {
+    const dataArr = JSON.parse(trainingSetInput.value);
+    neuralCore.setTrainingSamples([]);
+    dataArr.forEach((sample) => {
+      neuralCore.addTrainingSet(sample[0], sample[1]);
+    });
+
+    updateUI();
+  } catch (err) {
+    alert(err);
+  }
+}
+
 (window as any).reset = () => {
   neuralCore.reset();
   neuralCore.evaluate(input);
@@ -87,6 +101,10 @@ let itersInput: HTMLInputElement;
 let regTypeInput: HTMLInputElement;
 let regRateInput: HTMLInputElement;
 
+let trainingSetLabelsOutput: HTMLElement;
+let trainingSetDataOutput: HTMLElement;
+let trainingSetInput: HTMLInputElement;
+
 const main = () => {
   const content: HTMLCanvasElement = document.getElementById('content') as HTMLCanvasElement;
   inputControls = document.getElementById('input-controls');
@@ -97,6 +115,9 @@ const main = () => {
   itersInput = document.getElementById('iters-input') as HTMLInputElement;
   regTypeInput = document.getElementById('regularization-type-input') as HTMLInputElement;
   regRateInput = document.getElementById('regularization-rate-input') as HTMLInputElement;
+  trainingSetDataOutput = document.getElementById('training-set-data-output') as HTMLInputElement;
+  trainingSetLabelsOutput = document.getElementById('training-set-neurons-output') as HTMLInputElement;
+  trainingSetInput = document.getElementById('training-set-input') as HTMLInputElement;
 
   visualizer = new Visualizer(content);
 
@@ -160,6 +181,30 @@ const updateUI = () => {
 
   iter.innerHTML = neuralCore.getIteration().toString();
   cost.innerHTML = neuralCore.getCost().toString();
+
+  // Add training set data labels
+  let labels = '';
+  for (let i = 0; i < neuralCore.getInputSize(); i++) {
+    labels += `<th scope='col'>Input ${i}</th>`;
+  }
+  for (let i = 0; i < neuralCore.getOutputSize(); i++) {
+    labels += `<th scope='col' style="text-align: right">Output ${i}</th>`;
+  }
+  trainingSetLabelsOutput.innerHTML = labels;
+
+  // Add training data
+  let trainingData = '';
+  neuralCore.getTrainingSamples().forEach(sample => {
+    trainingData += '<tr>';
+    sample.input.forEach(val => {
+      trainingData += `<td>${val}</td>`;
+    });
+    sample.output.forEach(val => {
+      trainingData += `<td style="text-align: right">${val}</td>`;
+    });
+    trainingData += '</tr>';
+  });
+  trainingSetDataOutput.innerHTML = trainingData;
 }
 
 const addLayerControlRow = (label: string, size: string, onclickPos: string, onclickNeg: string): string => {
