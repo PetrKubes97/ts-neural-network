@@ -7,13 +7,15 @@ export class DrawableNeuron {
   public activation: number;
   public name: string;
   public isBias: boolean;
+  public id: number;
 
-  constructor(x, y, activation, name, isBias = false) {
+  constructor(x, y, activation, name, id, isBias = false) {
     this.x = x;
     this.y = y;
     this.activation = activation;
     this.name = name;
     this.isBias = isBias;
+    this.id = id;
   }
 }
 
@@ -23,6 +25,8 @@ export class Visualizer {
   private ctx: CanvasRenderingContext2D;
   private height: number;
   private width: number;
+  private drawableNeurons: DrawableNeuron[];
+  private drawableInputNeurons: DrawableNeuron[];
 
   constructor(content: HTMLCanvasElement) {
     this.content = content;
@@ -34,7 +38,8 @@ export class Visualizer {
   public draw(neurons: Neuron[][], connections: Connection[][]) {
     this.ctx.clearRect(0, 0, this.width, this.height);
 
-    const drawableNeurons: DrawableNeuron[] = [];
+    this.drawableNeurons = [];
+    this.drawableInputNeurons = [];
     const leftMargin = this.width / (neurons.length + 1);
 
     // Neurons
@@ -44,22 +49,26 @@ export class Visualizer {
         const x = leftMargin * (1 + lIdx);
         const y = topMargin * (1 + nIdx);
 
-        const drawableNeuron = new DrawableNeuron(x, y, neuron.getActivation(), neuron.getName());
-        drawableNeurons.push(drawableNeuron);
+        const drawableNeuron = new DrawableNeuron(x, y, neuron.getActivation(), neuron.getName(), nIdx);
+        this.drawableNeurons.push(drawableNeuron);
+
+        if (lIdx === 0) {
+          this.drawableInputNeurons.push(drawableNeuron);
+        }
       });
 
       if (lIdx != neurons.length - 1) {
         const x = leftMargin * (1 + lIdx);
         const y = topMargin * (1 + neurons[lIdx].length);
 
-        const drawableNeuron = new DrawableNeuron(x, y, 1, `bias${lIdx}`, true);
-        drawableNeurons.push(drawableNeuron);
+        const drawableNeuron = new DrawableNeuron(x, y, 1, `bias${lIdx}`, neurons[lIdx].length, true);
+        this.drawableNeurons.push(drawableNeuron);
       }
     });
 
     // Connections
     const drawableNameMap = new Map<string, DrawableNeuron>();
-    drawableNeurons.forEach(
+    this.drawableNeurons.forEach(
       (drawableNeuron) => drawableNameMap.set(drawableNeuron.name, drawableNeuron)// WTF, I was not able to create map from 2d arr
     );
 
@@ -78,7 +87,7 @@ export class Visualizer {
       });
     });
 
-    drawableNeurons.forEach((neuron) => {
+    this.drawableNeurons.forEach((neuron) => {
       this.drawNeuron(neuron);
     });
   }
@@ -117,11 +126,15 @@ export class Visualizer {
       Math.log(weight) :
       Math.log(-weight);
     this.ctx.strokeStyle = (weight > 0) ?
-      `rgba(205, 83, 52, ${weight})` :
-      `rgba(61, 232, 255, ${weight * -1})`;
+      `rgba(205, 83, 52, 1)` :
+      `rgba(61, 232, 255, 1)`;
     this.ctx.moveTo(inputNeuron.x, inputNeuron.y);
     this.ctx.lineTo(outputNeuron.x, outputNeuron.y);
     this.ctx.closePath();
     this.ctx.stroke();
+  }
+
+  public getDrawableInputNeurons() {
+    return this.drawableInputNeurons;
   }
 }

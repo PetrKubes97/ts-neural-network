@@ -10,3 +10,14 @@
 #controls b {
   margin: auto 0px;
 }
+
+#input-controls {
+  position: relative;
+}
+
+input[type=range][orient=vertical]
+{
+    writing-mode: bt-lr; /* IE */
+    -webkit-appearance: slider-vertical; /* WebKit */
+    width: 8px;
+}

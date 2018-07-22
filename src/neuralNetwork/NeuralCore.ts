@@ -67,6 +67,7 @@ export class NeuralCore {
   }
 
   public evaluate(input: number[]): number[] {
+
     if (input.length != this.inputSize) {
       throw 'Input size does not match';
     }
@@ -83,6 +84,12 @@ export class NeuralCore {
   }
 
   public addTrainingSet(input: number[], output: number[]) {
+    if (input.length != this.inputSize) {
+      throw 'Input size does not match';
+    } else if (output.length != this.outputSize) {
+      throw 'Output size does not match';
+    }
+
     this.trainSamples.push(new TrainSample(input, output))
   }
 
@@ -304,6 +311,7 @@ export class NeuralCore {
   }
 
   public reset() {
+    this.iterCnt = 0;
     this.createConnections(0, this.layerCnt - 1);
   }
 

@@ -1,6 +1,7 @@
-import { Visualizer } from './Visualizer';
+import { Visualizer, DrawableNeuron } from './Visualizer';
 import { NeuralCore } from './neuralNetwork/NeuralCore';
 import { Regularizations, TrainSample } from './neuralNetwork/HelperObjects';
+import { Neuron } from './neuralNetwork/Neuron';
 
 (window as any).slide = (i: number, value: number) => {
   input[i] = value;
@@ -10,10 +11,7 @@ import { Regularizations, TrainSample } from './neuralNetwork/HelperObjects';
 
 (window as any).addOrRemoveLayer = (add: boolean) => {
   neuralCore.addOrRemoveLayer(add);
-  neuralCore.evaluate(input);
-
   updateUI();
-  visualizer.draw(neuralCore.getNeurons(), neuralCore.getConnections());
 }
 
 (window as any).addOrRemoveNeuron = (add: boolean, layerIdx: number) => {
@@ -24,10 +22,8 @@ import { Regularizations, TrainSample } from './neuralNetwork/HelperObjects';
     else
       input.pop();
   }
-  neuralCore.evaluate(input);
 
   updateUI();
-  visualizer.draw(neuralCore.getNeurons(), neuralCore.getConnections());
 }
 
 (window as any).train = (multipleIters: boolean) => {
@@ -53,9 +49,7 @@ import { Regularizations, TrainSample } from './neuralNetwork/HelperObjects';
     neuralCore.train();
   }
 
-  neuralCore.evaluate(input);
   updateUI();
-  visualizer.draw(neuralCore.getNeurons(), neuralCore.getConnections());
 }
 
 (window as any).setTrainingData = () => {
@@ -74,9 +68,12 @@ import { Regularizations, TrainSample } from './neuralNetwork/HelperObjects';
 
 (window as any).reset = () => {
   neuralCore.reset();
-  neuralCore.evaluate(input);
   updateUI();
-  visualizer.draw(neuralCore.getNeurons(), neuralCore.getConnections());
+}
+
+(window as any).applyTrainingSample = (idx: number) => {
+  input = neuralCore.getTrainingSamples()[idx].input;
+  updateUI();
 }
 
 window.onload = () => {
@@ -87,11 +84,12 @@ let neuralCore: NeuralCore;
 let visualizer: Visualizer;
 let input: number[];
 
-let inputSize = 4;
+let inputSize = 2;
 let hiddenSizes = [3];
-let outputSize = 4;
+let outputSize = 1;
 let layerControls: HTMLElement;
 let inputControls: HTMLElement;
+let canvas: HTMLCanvasElement;
 
 let cost: HTMLElement;
 let iter: HTMLElement;
@@ -106,7 +104,7 @@ let trainingSetDataOutput: HTMLElement;
 let trainingSetInput: HTMLInputElement;
 
 const main = () => {
-  const content: HTMLCanvasElement = document.getElementById('content') as HTMLCanvasElement;
+  canvas = document.getElementById('content') as HTMLCanvasElement;
   inputControls = document.getElementById('input-controls');
   layerControls = document.getElementById('layer-controls');
   iter = document.getElementById('iter-output');
@@ -119,7 +117,7 @@ const main = () => {
   trainingSetLabelsOutput = document.getElementById('training-set-neurons-output') as HTMLInputElement;
   trainingSetInput = document.getElementById('training-set-input') as HTMLInputElement;
 
-  visualizer = new Visualizer(content);
+  visualizer = new Visualizer(canvas);
 
   initCore();
 }
@@ -127,9 +125,10 @@ const main = () => {
 const initCore = () => {
   neuralCore = new NeuralCore(inputSize, hiddenSizes, outputSize);
 
-  neuralCore.addTrainingSet([1, 0, 0, 0], [0, 1, 0, 0]);
-  neuralCore.addTrainingSet([0, 1, 0, 0], [0, 0, 1, 0]);
-  neuralCore.addTrainingSet([0, 0, 1, 0], [0, 0, 0, 1]);
+  neuralCore.addTrainingSet([1, 1], [0]);
+  neuralCore.addTrainingSet([1, 0], [1]);
+  neuralCore.addTrainingSet([0, 1], [1]);
+  neuralCore.addTrainingSet([0, 0], [0]);
 
   // Set default values
   input = new Array(neuralCore.getInputSize());
@@ -137,10 +136,12 @@ const initCore = () => {
 
   neuralCore.evaluate(input);
   updateUI();
-  visualizer.draw(neuralCore.getNeurons(), neuralCore.getConnections());
 }
 
 const updateUI = () => {
+  neuralCore.evaluate(input);
+  visualizer.draw(neuralCore.getNeurons(), neuralCore.getConnections());
+
   let content = addLayerControlRow(
     'Layers',
     neuralCore.getLayerCnt().toString(),
@@ -175,9 +176,21 @@ const updateUI = () => {
   layerControls.innerHTML = content;
 
   inputControls.innerHTML = '';
-  for (let i = 0; i < neuralCore.getInputSize(); i++) {
-    inputControls.innerHTML += `<label>Neuron ${i}:</label> <input style="position: relative; top: 5px;" type="range" min="0" max="1" value="1" step="0.05" id="slider${i}" oninput="slide(${i}, this.value);"><br>`;
+
+  if (!visualizer.getDrawableInputNeurons()) {
+    visualizer.draw(neuralCore.getNeurons(), neuralCore.getConnections());
   }
+
+
+  const controlHeight = 50;
+  visualizer.getDrawableInputNeurons().forEach((neuron: DrawableNeuron) => {
+    const x = neuron.x - 50;
+    const y = neuron.y - controlHeight / 2 + 5;
+    inputControls.innerHTML += `<input
+      style="position: absolute; top: ${y}px; left: ${x}px; height: ${controlHeight}px;" 
+      type="range" orient="vertical" min="0" max="1" value="${neuron.activation}" step="0.05" 
+      oninput="slide(${neuron.id}, this.value);">`;
+  })
 
   iter.innerHTML = neuralCore.getIteration().toString();
   cost.innerHTML = neuralCore.getCost().toString();
@@ -194,8 +207,8 @@ const updateUI = () => {
 
   // Add training data
   let trainingData = '';
-  neuralCore.getTrainingSamples().forEach(sample => {
-    trainingData += '<tr>';
+  neuralCore.getTrainingSamples().forEach((sample, idx) => {
+    trainingData += `<tr style="cursor:pointer;" onclick="applyTrainingSample(${idx})">`;
     sample.input.forEach(val => {
       trainingData += `<td>${val}</td>`;
     });

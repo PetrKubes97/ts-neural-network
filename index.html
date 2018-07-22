@@ -17,27 +17,38 @@
 
 <body>
   <div class="container mt-3">
+    <div class="custom-control custom-checkbox" style="float: right;">
+      <input type="checkbox" class="custom-control-input" id="customCheck1" checked="checked">
+      <label class="custom-control-label" for="customCheck1">Show ads</label>
+    </div>
     <h1>Neural network visualized</h1>
     <p class="lead">Visualization of a simple neural network for strictly educational purposes.</p>
     <hr>
     <div class="container-fluid" id="controls">
       <div class="row">
-        <div class="col-md-3">
-          <h5>Input values</h5>
-          <div id="input-controls"></div>
-        </div>
-        <div class="col-md-3">
+        <div class="col-md-4">
           <h5>Network size</h5>
           <table id="layer-controls">
           </table>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-4 pr-5">
           <h5>Learning settings</h5>
           <div class="row">
             <label for="rate-input" class="control-label col-8">Learning rate:</label>
-            <input class="form-control form-control-sm col-4" id="rate-input" type="number" name="rate" min="0" max="10" step="0.1" value="1">
+            <select class="form-control form-control-sm col-4" id="rate-input">
+              <option value="0.001">0.001</option>
+              <option value="0.003">0.003</option>
+              <option value="0.01">0.01</option>
+              <option value="0.03">0.03</option>
+              <option value="0.1">0.1</option>
+              <option value="0.3">0.3</option>
+              <option value="1" selected="true">1</option>
+              <option value="3">3</option>
+              <option value="10">10</option>
+              <option value="30">30</option>
+            </select>
           </div>
-          <div class="row">
+          <div class="row mt-1 mb-1">
             <label for="regularization-input" class="col-8">Regularization:</label>
             <select class="form-control form-control-sm col-4" id="regularization-type-input">
               <option value="none">None</option>
@@ -47,11 +58,25 @@
           </div>
           <div class="row">
             <label for="regularization-input" class="col-8">Regularization rate:</label>
-            <input class="form-control form-control-sm col-4" id="regularization-rate-input" type="number" name="rate" min="0" max="10"
-              step="0.1" value="0.1">
+            <select class="form-control form-control-sm col-4" id="regularization-rate-input">
+              <option value="0.00001">0.00001</option>
+              <option value="0.00003">0.00003</option>
+              <option value="0.0001">0.0001</option>
+              <option value="0.0003" selected="true">0.0003</option>
+              <option value="0.001">0.001</option>
+              <option value="0.003">0.003</option>
+              <option value="0.01">0.01</option>
+              <option value="0.03">0.03</option>
+              <option value="0.1">0.1</option>
+              <option value="0.3">0.3</option>
+              <option value="1">1</option>
+              <option value="3">3</option>
+              <option value="10">10</option>
+              <option value="30">30</option>
+            </select>
           </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-4 pr-5">
           <h5>Train</h5>
           <div class="row">
             <label for="iters-input" class="col-8">Num. of iterations:</label>
@@ -68,7 +93,13 @@
       <div class="row">
         <div class="col-4">
           <h5>Training set input</h5>
-          <textarea class="form-control" id="training-set-input" rows="3"></textarea>
+          <textarea class="form-control" id="training-set-input" rows="6">
+[
+  [[1,1],[0]],
+  [[1,0],[1]],
+  [[0,1],[1]],
+  [[0,0],[0]]
+]</textarea>
           <button type="button" class="btn btn-outline-primary btn-sm mt-3" onclick="setTrainingData()">Set training data</button>
         </div>
         <div class="col-8">
@@ -76,7 +107,6 @@
           <table class="table table-sm table-bordered table-hover table-striped">
             <thead class="thead-dark">
               <tr id="training-set-neurons-output">
-
               </tr>
             </thead>
             <tbody id="training-set-data-output">
@@ -91,14 +121,21 @@
           <button type="button" class="btn btn-secondary" onclick="train(false)">Step</button>
           <button type="button" class="btn btn-danger" onclick="reset()">Reset</button>
         </div>
-        <div class="col-md-auto">
+        <div class="col-md-auto" style="padding-top: 5px;">
           Cost:
           <b id="cost"></b>
         </div>
       </div>
     </div>
+    <div id="input-controls"></div>
+    <canvas id="content" width="1200" height="600" style="border: 5px solid #2E282A; margin-bottom: 1em">Sorry, you need a better browser to see the neural net.</canvas>
+    <div>
+      <h2>What is this?</h2>
+      <p>
+        This is implementation of neural network with back-propagation. blablabla
+      </p>
+    </div>
 
-    <canvas id="content" width="1200" height="600" style="border: 5px solid #2E282A; margin-bottom: 70px;"></canvas>
   </div>
 </body>
 
