@@ -11,16 +11,20 @@
     crossorigin="anonymous">
   <link rel="stylesheet" href="main.css">
   <script src="./dist/main.js"></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
 
+  <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({
+      google_ad_client: "ca-pub-3364556172084454",
+      enable_page_level_ads: true
+    });
+  </script>
   <title>Neural network visualized</title>
 </head>
 
 <body>
   <div class="container mt-3">
-    <div class="custom-control custom-checkbox" style="float: right;">
-      <input type="checkbox" class="custom-control-input" id="customCheck1" checked="checked">
-      <label class="custom-control-label" for="customCheck1">Show ads</label>
-    </div>
     <h1>Neural network visualized</h1>
     <p class="lead">Visualization of a simple neural network for strictly educational purposes.</p>
     <hr>
@@ -117,6 +121,9 @@
       <hr>
       <div class="row mb-3">
         <div class="col-md-auto">
+
+          <input type="checkbox">
+          <label>Repeat</label>
           <button type="button" class="btn btn-primary mr-2" onclick="train(true)">Train</button>
           <button type="button" class="btn btn-secondary" onclick="train(false)">Step</button>
           <button type="button" class="btn btn-danger" onclick="reset()">Reset</button>
@@ -131,9 +138,43 @@
     <canvas id="content" width="1200" height="600" style="border: 5px solid #2E282A; margin-bottom: 1em">Sorry, you need a better browser to see the neural net.</canvas>
     <div>
       <h2>What is this?</h2>
-      <p>
-        This is implementation of neural network with back-propagation. blablabla
+      <h5>Cost function</h5>
+      <p>This is implementation of neural network with back-propagation. There aren't any special tricks, it's as simple neural
+        network as it gets. The cost is defined as \(C = \frac{1}{2 \times sampleCnt}\sum^{sampleCnt}_{m=1}(\sum^{outputSize}_{n=1}(neruon_n-target_n)^2)\).
+        In words: Error is defined as \((value - target)^2\). To get error of neural network for one training sample, you
+        simply add errors of all output neurons. The total cost is then defined as average error of all training samples.
       </p>
+      <h5>Forward propagation</h5>
+      <p>
+        Let's say that the value of connection is the connection's weight (how wide it is) times the first connected neuron. To calculate
+        the value of some neuron you add the values of all incoming connections and apply the
+        <a href="https://www.desmos.com/calculator/dw9fmqwlmn">sigmoid</a> function the that sum. Other activation functions are possible, but I have not implemented them yet.
+      </p>
+      <h5>Back propagation</h5>
+      <p>
+        In the simplest way possible: The cost function defined above is a function dependend on weights of connections in the same
+        way as \(f(x, y) = x^2 + y^2\) is dependend on x and y. What you do is that you take derivation of C with respect
+        to each of the weights. Each of these derivatives tells you in which direction (up/down) will the cost change if
+        you increase/decrease the weight. So you take the old weight and substract a small step is a direction that decreases
+        the cost. In equation: \(w_{new} = w_{old} - rate \times \frac{\partial C}{\partial w_{old}}\). How to compute the
+        derivative is a little bit harder, but all you need to know is the
+        <i>chain rule</i>. I highly recommend
+        <a href="https://www.youtube.com/watch?v=aircAruvnKk">3blue1brown's series</a> and
+        <a href="https://web.archive.org/web/20150317210621/https://www4.rgu.ac.uk/files/chapter3%20-%20bp.pdf">this paper</a> for better understanding.
+      </p>
+      <h5>Inpiration</h5>
+      <p>
+        I got inspired by the
+        <a href="https://playground.tensorflow.org">https://playground.tensorflow.org</a> and
+        <a href="https://cs.stanford.edu/people/karpathy/convnetjs/">https://cs.stanford.edu/people/karpathy/convnetjs/</a>, but I wanted something simpler and build it myself from the
+        ground up.
+      </p>
+
+      <footer class="futter m-5" style="text-align: center;">
+        Created by
+        <a href="mailto:petrkubes1997@gmail.com?Subject=Nerual%20network%20-%20suggestion/hate/or%20just%20saying%20hi" target="_top">Petr Kubeš</a>
+      </footer>
+
     </div>
 
   </div>
