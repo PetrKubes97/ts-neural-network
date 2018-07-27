@@ -21,3 +21,7 @@ input[type=range][orient=vertical]
     -webkit-appearance: slider-vertical; /* WebKit */
     width: 8px;
 }
+
+.checkbox {
+  margin-right: 15px;
+}

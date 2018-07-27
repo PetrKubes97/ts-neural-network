@@ -45,10 +45,22 @@ import { Neuron } from './neuralNetwork/Neuron';
 
   neuralCore.setRegularizationRate(Number.parseFloat(regRateInput.value));
 
+  if (trainRepeat.checked && interval == null) {
+    trainBtn.innerText = "Stop"
+    interval = setInterval(() => { runTrainLoop(iters) }, 100);
+  } else if (interval != null) {
+    clearInterval(interval);
+    interval = null;
+    trainBtn.innerText = "Start"
+  } else {
+    runTrainLoop(iters);
+  }
+}
+
+const runTrainLoop = (iters: number) => {
   for (let i = 0; i < iters; i++) {
     neuralCore.train();
   }
-
   updateUI();
 }
 
@@ -59,7 +71,7 @@ import { Neuron } from './neuralNetwork/Neuron';
     dataArr.forEach((sample) => {
       neuralCore.addTrainingSet(sample[0], sample[1]);
     });
-
+    neuralCore.reset();
     updateUI();
   } catch (err) {
     alert(err);
@@ -83,10 +95,12 @@ window.onload = () => {
 let neuralCore: NeuralCore;
 let visualizer: Visualizer;
 let input: number[];
+let interval = null;
 
 let inputSize = 2;
 let hiddenSizes = [3];
 let outputSize = 1;
+
 let layerControls: HTMLElement;
 let inputControls: HTMLElement;
 let canvas: HTMLCanvasElement;
@@ -98,6 +112,8 @@ let rateInput: HTMLInputElement;
 let itersInput: HTMLInputElement;
 let regTypeInput: HTMLInputElement;
 let regRateInput: HTMLInputElement;
+let trainRepeat: HTMLInputElement;
+let trainBtn: HTMLInputElement;
 
 let trainingSetLabelsOutput: HTMLElement;
 let trainingSetDataOutput: HTMLElement;
@@ -116,6 +132,8 @@ const main = () => {
   trainingSetDataOutput = document.getElementById('training-set-data-output') as HTMLInputElement;
   trainingSetLabelsOutput = document.getElementById('training-set-neurons-output') as HTMLInputElement;
   trainingSetInput = document.getElementById('training-set-input') as HTMLInputElement;
+  trainRepeat = document.getElementById('train-repeat-chckbx') as HTMLInputElement;
+  trainBtn = document.getElementById('train-btn') as HTMLInputElement;
 
   visualizer = new Visualizer(canvas);
 

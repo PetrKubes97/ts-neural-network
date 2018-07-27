@@ -126,8 +126,8 @@ export class Visualizer {
       Math.log(weight) :
       Math.log(-weight);
     this.ctx.strokeStyle = (weight > 0) ?
-      `rgba(205, 83, 52, 1)` :
-      `rgba(61, 232, 255, 1)`;
+      `rgba(61, 232, 255, 1)` :
+      `rgba(205, 83, 52, 1)`;
     this.ctx.moveTo(inputNeuron.x, inputNeuron.y);
     this.ctx.lineTo(outputNeuron.x, outputNeuron.y);
     this.ctx.closePath();
