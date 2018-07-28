@@ -12,11 +12,23 @@
   <link rel="stylesheet" href="main.css">
   <script src="./dist/main.js"></script>
   <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
-
+  <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.1.0/cookieconsent.min.css"
+  />
+  <script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.1.0/cookieconsent.min.js"></script>
   <script>
-    (adsbygoogle = window.adsbygoogle || []).push({
-      google_ad_client: "ca-pub-3364556172084454",
-      enable_page_level_ads: true
+    window.addEventListener("load", function () {
+      window.cookieconsent.initialise({
+        "palette": {
+          "popup": {
+            "background": "#237afc"
+          },
+          "button": {
+            "background": "#fff",
+            "text": "#237afc"
+          }
+        },
+        "theme": "edgeless"
+      })
     });
   </script>
   <title>Neural network visualized</title>
