@@ -1,3 +1,9 @@
+body{
+  min-width:1000px;        /* Suppose you want minimum width of 1000px */
+  width: auto !important;  /* Firefox will set width as auto */
+  width:1000px;            /* As IE6 ignores !important it will set width as 1000px; */
+}
+
 #controls label {
   font-size: 0.9em;
   margin: auto 0px;
