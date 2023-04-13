@@ -153,7 +153,7 @@ export class NeuralCore {
           let regDer = 0;
           switch (this.regType) {
             case Regularizations.L1:
-              regDer = L1Reg.der(connection.getWeight());
+              regDer = L1Reg.der(connection.getWeight(), getNumberOfConnections(this.connections));
               break;
             case Regularizations.L2:
               regDer = L2Reg.der(connection.getWeight(), getNumberOfConnections(this.connections));

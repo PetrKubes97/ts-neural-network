@@ -23,12 +23,12 @@ export const L1Reg = {
   cost: (connections: Connection[][]): number => {
     return connections.reduce(
       (prev, connLayer: Connection[]) => {
-        return prev + Math.abs(connLayer.reduce((acc, conn) => acc + conn.getWeight(), 0))
+        return prev + connLayer.reduce((acc, conn) => acc + Math.abs(conn.getWeight()), 0)
       }, 0) * (1 / getNumberOfConnections(connections));
   },
 
-  der: (weight: number): number => {
-    return (weight > 0) ? 1 : -1;
+  der: (weight: number, connCount: number): number => {
+    return ((weight > 0) ? 1 : -1)  * (1 / connCount);
   }
 }
 
@@ -36,7 +36,7 @@ export const L2Reg = {
   cost: (connections: Connection[][]): number => {
     return 1 / 2 * connections.reduce(
       (prev, connLayer: Connection[]) => {
-        return prev + connLayer.reduce((acc, conn) => acc + conn.getWeight(), 0) ** 2
+        return prev + connLayer.reduce((acc, conn) => acc + conn.getWeight() ** 2, 0)
       }, 0) * (1 / getNumberOfConnections(connections));
   },
 
