@@ -122,9 +122,7 @@ export class Visualizer {
 
   private drawConnection(inputNeuron: DrawableNeuron, outputNeuron: DrawableNeuron, weight: number) {
     this.ctx.beginPath();
-    this.ctx.lineWidth = (weight > 0) ?
-      Math.log(weight) :
-      Math.log(-weight);
+    this.ctx.lineWidth = Math.log(1.001 + Math.abs(weight));
     this.ctx.strokeStyle = (weight > 0) ?
       `rgba(61, 232, 255, 1)` :
       `rgba(205, 83, 52, 1)`;
