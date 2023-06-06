@@ -77,6 +77,18 @@ const runTrainLoop = (iters: number) => {
     alert(err);
   }
 }
+(window as any).setWeights = () => {
+  const weights: number[][][] = JSON.parse(weightsInput.value);
+  neuralCore.setWeights(weights);
+  neuralCore.reset();
+  updateUI();
+}
+(window as any).setBias = () => {
+  const weights: number[][] = JSON.parse(biasInput.value);
+  neuralCore.setBias(weights);
+  neuralCore.reset();
+  updateUI();
+}
 
 (window as any).reset = () => {
   neuralCore.reset();
@@ -97,9 +109,9 @@ let visualizer: Visualizer;
 let input: number[];
 let interval = null;
 
-let inputSize = 2;
-let hiddenSizes = [3];
-let outputSize = 1;
+let inputSize = 3;
+let hiddenSizes = [2];
+let outputSize = 2;
 
 let layerControls: HTMLElement;
 let inputControls: HTMLElement;
@@ -118,6 +130,8 @@ let trainBtn: HTMLInputElement;
 let trainingSetLabelsOutput: HTMLElement;
 let trainingSetDataOutput: HTMLElement;
 let trainingSetInput: HTMLInputElement;
+let weightsInput: HTMLInputElement;
+let biasInput: HTMLInputElement;
 
 const main = () => {
   canvas = document.getElementById('content') as HTMLCanvasElement;
@@ -132,6 +146,8 @@ const main = () => {
   trainingSetDataOutput = document.getElementById('training-set-data-output') as HTMLInputElement;
   trainingSetLabelsOutput = document.getElementById('training-set-neurons-output') as HTMLInputElement;
   trainingSetInput = document.getElementById('training-set-input') as HTMLInputElement;
+  weightsInput = document.getElementById('training-set-weights') as HTMLInputElement;
+  biasInput = document.getElementById('training-set-bias') as HTMLInputElement;
   trainRepeat = document.getElementById('train-repeat-chckbx') as HTMLInputElement;
   trainBtn = document.getElementById('train-btn') as HTMLInputElement;
 
@@ -143,10 +159,7 @@ const main = () => {
 const initCore = () => {
   neuralCore = new NeuralCore(inputSize, hiddenSizes, outputSize);
 
-  neuralCore.addTrainingSet([1, 1], [0]);
-  neuralCore.addTrainingSet([1, 0], [1]);
-  neuralCore.addTrainingSet([0, 1], [1]);
-  neuralCore.addTrainingSet([0, 0], [0]);
+  neuralCore.addTrainingSet([3, 0, 1], [1, 0]);
 
   // Set default values
   input = new Array(neuralCore.getInputSize());
@@ -158,7 +171,6 @@ const initCore = () => {
 
 const updateUI = () => {
   neuralCore.evaluate(input);
-  visualizer.draw(neuralCore.getNeurons(), neuralCore.getConnections());
 
   let content = addLayerControlRow(
     'Layers',
@@ -236,6 +248,7 @@ const updateUI = () => {
     trainingData += '</tr>';
   });
   trainingSetDataOutput.innerHTML = trainingData;
+  visualizer.draw(neuralCore.getNeurons(), neuralCore.getConnections());
 }
 
 const addLayerControlRow = (label: string, size: string, onclickPos: string, onclickNeg: string): string => {
