@@ -112,8 +112,8 @@ export class Visualizer {
 
     this.ctx.fillStyle = `rgb(46,40,42, 1)`
     const height = 16;
-    this.ctx.font = `bold ${height}px serif`;
-    const text = Number(drawableNeuron.activation).toFixed(2);
+    this.ctx.font = `bold ${height}px`;
+    const text = Number(drawableNeuron.activation).toFixed(4);
     this.ctx.fillText(
       text,
       drawableNeuron.x - this.ctx.measureText(text).width / 2,
@@ -126,6 +126,18 @@ export class Visualizer {
     this.ctx.strokeStyle = (weight > 0) ?
       `rgba(61, 232, 255, 1)` :
       `rgba(205, 83, 52, 1)`;
+
+    // y = ax + c
+    const a = (outputNeuron.y - inputNeuron.y) / (outputNeuron.x - inputNeuron.x)
+    const c = outputNeuron.y - a * outputNeuron.x
+    const x = (outputNeuron.x - 60);
+    const y = a * x + c
+    this.ctx.font = `12px`;
+    this.ctx.fillText(
+        Number(weight).toFixed(4),
+        x,
+        y);
+
     this.ctx.moveTo(inputNeuron.x, inputNeuron.y);
     this.ctx.lineTo(outputNeuron.x, outputNeuron.y);
     this.ctx.closePath();
