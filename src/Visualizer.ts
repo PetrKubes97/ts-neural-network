@@ -127,21 +127,29 @@ export class Visualizer {
       `rgba(61, 232, 255, 1)` :
       `rgba(205, 83, 52, 1)`;
 
-    // y = ax + c
-    const a = (outputNeuron.y - inputNeuron.y) / (outputNeuron.x - inputNeuron.x)
-    const c = outputNeuron.y - a * outputNeuron.x
-    const x = (outputNeuron.x - 60);
-    const y = a * x + c
-    this.ctx.font = `12px`;
-    this.ctx.fillText(
-        Number(weight).toFixed(4),
-        x,
-        y);
-
     this.ctx.moveTo(inputNeuron.x, inputNeuron.y);
     this.ctx.lineTo(outputNeuron.x, outputNeuron.y);
     this.ctx.closePath();
     this.ctx.stroke();
+
+    // Draw connection weights
+    // y = ax + c
+    const a = (outputNeuron.y - inputNeuron.y) / (outputNeuron.x - inputNeuron.x)
+    const c = outputNeuron.y - a * outputNeuron.x
+    let x;
+    if (inputNeuron.name.indexOf("bias") > -1) {
+      x = inputNeuron.x + 60;
+    } else {
+      x = outputNeuron.x - 60;
+    }
+    const y = a * x + c;
+
+    this.ctx.font = `12px`;
+    this.ctx.save();
+    this.ctx.translate(x, y);
+    this.ctx.rotate(Math.atan(a));
+    this.ctx.fillText(Number(weight).toFixed(4), 0, 0);
+    this.ctx.restore();
   }
 
   public getDrawableInputNeurons() {
