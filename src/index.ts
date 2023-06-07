@@ -215,7 +215,7 @@ const updateUI = () => {
 
   const controlHeight = 50;
   visualizer.getDrawableInputNeurons().forEach((neuron: DrawableNeuron) => {
-    const x = neuron.x - 50;
+    const x = neuron.x - 80;
     const y = neuron.y - controlHeight / 2 + 5;
     inputControls.innerHTML += `<input
       style="position: absolute; top: ${y}px; left: ${x}px; height: ${controlHeight}px;" 

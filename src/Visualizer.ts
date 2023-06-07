@@ -137,10 +137,11 @@ export class Visualizer {
     const a = (outputNeuron.y - inputNeuron.y) / (outputNeuron.x - inputNeuron.x)
     const c = outputNeuron.y - a * outputNeuron.x
     let x;
+    const distanceFromOrigin = 60;
     if (inputNeuron.name.indexOf("bias") > -1) {
-      x = inputNeuron.x + 60;
+      x = inputNeuron.x + (distanceFromOrigin/Math.sqrt(1+a**2))
     } else {
-      x = outputNeuron.x - 60;
+      x = outputNeuron.x - (distanceFromOrigin/Math.sqrt(1+a**2))
     }
     const y = a * x + c;
 

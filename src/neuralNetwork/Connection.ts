@@ -6,10 +6,10 @@ export class Connection {
   private outputNeuron: Neuron;
   private sampleWeightChanges: number[] = [];
 
-  constructor(input: Neuron, output: Neuron, weight: number) {
+  constructor(input: Neuron, output: Neuron, weight?: number) {
     this.inputNeuron = input;
     this.outputNeuron = output;
-    this.weight = weight;
+    this.weight = weight || Math.random();
   }
 
   public addSampleWeightChange(weightChange: number) {
