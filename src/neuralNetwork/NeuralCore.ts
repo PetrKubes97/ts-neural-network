@@ -68,12 +68,57 @@ export class NeuralCore {
     this.createConnections(0, this.layerCnt - 1);
   }
 
+  private resetWeights() {
+    let temp: number[][][];
+    this.weightList = temp;
+  }
+
   public setWeights(weights: number[][][]) {
+    this.resetWeights();
+    if (weights.length !== this.layerCnt - 1) {
+      throw 'Weight count does not match layer count';
+    }
+    for (let i = 0; i < weights[0].length; i++) {
+      if (weights[0][i].length !== this.inputSize) {
+        throw `Weights at hidden layer 1 of neuron ${i+1} do not match the input count`;
+      }
+    }
+    for (let size = 1; size < this.hiddenLayerSizes.length; size++) {
+      if (weights[size].length !== this.hiddenLayerSizes[size]) {
+        throw `Weights at hidden layer ${size+1} do not match the neuron count`;
+      }
+      for (let i = 0; i < weights[size].length; i++) {
+        if (weights[size][i].length !== this.hiddenLayerSizes[size-1]) {
+          throw `Weights at hidden layer ${size+1} of neuron ${i+1} do not match the input count`;
+        }
+      }
+    }
+    for (let i = 0; i < weights[weights.length - 1].length; i++) {
+      if (weights[weights.length - 1][i].length !== this.hiddenLayerSizes[this.hiddenLayerSizes.length - 1]) {
+        throw `Weights at output layer of neuron ${i+1} do not match the input count`;
+      }
+    }
 
     this.weightList = weights;
   }
 
+  private resetBiasList() {
+    let temp: number[][];
+    this.biasList = temp;
+  }
   public setBias(biasList: number[][]) {
+    this.resetBiasList();
+    if (biasList.length !== this.hiddenLayerSizes.length + 1) {
+      throw 'Bias count does not match layer count';
+    }
+    for (let i = 0; i < biasList.length - 1; i++) {
+      if (biasList[i].length !== this.hiddenLayerSizes[i]) {
+        throw `Bias at layer ${i+1} do not match the hidden layer count`;
+      }
+    }
+    if (biasList[biasList.length - 1].length !== this.outputSize) {
+      throw `Bias at output layer do not match the output layer count`;
+    }
 
     this.biasList = biasList;
   }

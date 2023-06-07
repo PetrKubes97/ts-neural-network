@@ -77,17 +77,41 @@ const runTrainLoop = (iters: number) => {
     alert(err);
   }
 }
+(window as any).randomWeights = () => {
+      weightsInput.value = '[]'
+      try {
+        neuralCore.setWeights([]);
+      } catch {}
+      neuralCore.reset();
+      updateUI()
+}
+(window as any).randomBias = () => {
+      biasInput.value = '[]'
+      try {
+        neuralCore.setBias([]);
+      } catch {}
+      neuralCore.reset();
+      updateUI()
+}
 (window as any).setWeights = () => {
-  const weights: number[][][] = JSON.parse(weightsInput.value);
-  neuralCore.setWeights(weights);
-  neuralCore.reset();
-  updateUI();
+  try {
+      const weights: number[][][] = JSON.parse(weightsInput.value);
+      neuralCore.setWeights(weights);
+      neuralCore.reset();
+      updateUI();
+    } catch (err) {
+      alert(err);
+    }
 }
 (window as any).setBias = () => {
-  const weights: number[][] = JSON.parse(biasInput.value);
-  neuralCore.setBias(weights);
-  neuralCore.reset();
-  updateUI();
+  try {
+      const weights: number[][] = JSON.parse(biasInput.value);
+      neuralCore.setBias(weights);
+      neuralCore.reset();
+      updateUI();
+    } catch (err) {
+      alert(err);
+    }
 }
 
 (window as any).reset = () => {

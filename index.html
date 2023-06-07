@@ -120,7 +120,7 @@
                 </table>
             </div>
         </div>
-        <div class="row">
+        <div class="row mt-3">
             <div class="col-6">
                 <h5>Weights</h5>
                 <textarea class="form-control" id="training-set-weights" rows="6">
@@ -129,6 +129,8 @@
     [[0.2, 0.1], [0.1, 0.4]]
 ]</textarea>
                 <button type="button" class="btn btn-outline-primary btn-sm mt-3" onclick="setWeights()">Set Weights
+                </button>
+                <button type="button" class="btn btn-outline-secondary btn-sm mt-3" onclick="randomWeights()">Random Weights
                 </button>
             </div>
             <div class="col-6">
@@ -139,6 +141,8 @@
     [0.6, 0.3]
 ]</textarea>
                 <button type="button" class="btn btn-outline-primary btn-sm mt-3" onclick="setBias()">Set Bias
+                </button>
+                <button type="button" class="btn btn-outline-secondary btn-sm mt-3" onclick="randomBias()">Random Bias
                 </button>
             </div>
         </div>
