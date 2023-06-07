@@ -270,13 +270,13 @@ export class NeuralCore {
       //// Add connections from the prev layer
       if (!isInput) {
         this.neurons[layerIdx - 1].forEach((neuron, idx) => {
-          const connection = new Connection(neuron, newNeuron,1);
+          const connection = new Connection(neuron, newNeuron);
           neuron.addOutput(connection);
           newNeuron.addInput(connection);
           this.connections[layerIdx - 1].push(connection);
         });
         // Dont forget the bias
-        const connection = new Connection(this.biasNeuron, newNeuron, 1);
+        const connection = new Connection(this.biasNeuron, newNeuron);
         newNeuron.addInput(connection);
         this.connections[layerIdx - 1].push(connection);
       }
@@ -284,7 +284,7 @@ export class NeuralCore {
       if (!isOutput) {
         //// Add connections to the next layer
         this.neurons[layerIdx + 1].forEach((neuron, idx) => {
-          const connection = new Connection(newNeuron, neuron, 1);
+          const connection = new Connection(newNeuron, neuron);
           neuron.addInput(connection);
           this.connections[layerIdx].push(connection);
         });
@@ -351,7 +351,7 @@ export class NeuralCore {
           try {
             weight = this.weightList[l][toIdx][fromIdx]
           } catch {
-            weight = 0
+            // Happens if new layers have been added - use default value from Connection
           }
           const connection = new Connection(currNeuron, nextNeuron, weight)
           currNeuron.addOutput(connection);
@@ -361,9 +361,9 @@ export class NeuralCore {
 
         let bias;
         try {
-          bias = this.biasList[l][toIdx]
+          bias = this.biasList[l][toIdx];
         } catch {
-          bias = 0;
+          // Happens if new layers have been added - use default value from Connection
         }
 
         // Add bias neuron to each layer
