@@ -160,6 +160,7 @@ const initCore = () => {
   neuralCore = new NeuralCore(inputSize, hiddenSizes, outputSize);
 
   neuralCore.addTrainingSet([3, 0, 1], [1, 0]);
+  neuralCore.addTrainingSet([1,3,2],[0,1]);
 
   // Set default values
   input = new Array(neuralCore.getInputSize());

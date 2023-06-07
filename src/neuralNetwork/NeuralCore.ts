@@ -145,7 +145,6 @@ export class NeuralCore {
       this.neurons[this.layerCnt - 1].forEach((neuron, idx) => {
         const newSigma =
           (sample.output[idx] - neuron.getActivation()) * SIGMOID.der(neuron.getActivation());
-
         neuron.setSigma(newSigma);
       });
 
@@ -348,14 +347,24 @@ export class NeuralCore {
 
       this.neurons[l + 1].forEach((nextNeuron, toIdx) => { // If you wonder why this cycles are switched, it's because of the bias
         this.neurons[l].forEach((currNeuron, fromIdx) => {
-          let weight = this.weightList[l][toIdx][fromIdx]
+          let weight;
+          try {
+            weight = this.weightList[l][toIdx][fromIdx]
+          } catch {
+            weight = 0
+          }
           const connection = new Connection(currNeuron, nextNeuron, weight)
           currNeuron.addOutput(connection);
           nextNeuron.addInput(connection);
           this.connections[l].push(connection);
         });
 
-        const bias = this.biasList[l][toIdx]
+        let bias;
+        try {
+          bias = this.biasList[l][toIdx]
+        } catch {
+          bias = 0;
+        }
 
         // Add bias neuron to each layer
         const biasConnection = new Connection(this.biasNeuron, nextNeuron, bias);
