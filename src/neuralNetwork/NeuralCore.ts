@@ -8,11 +8,8 @@ export class NeuralCore {
   private outputSize: number;
 
   private layerCnt: number;
-  private biasList: number[][] = [[0.4, 0.2], [0.6, 0.3]]
-  private weightList: number[][][] = [
-      [[0.1, 0.2, 0.6], [0.4, 0.3, 0.1]],
-      [[0.2, 0.1], [0.1, 0.4]]
-  ]
+  private biasList: number[][];
+  private weightList: number[][][];
 
   private iterCnt = 0;
 
