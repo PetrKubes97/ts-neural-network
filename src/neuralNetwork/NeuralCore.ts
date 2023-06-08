@@ -8,7 +8,6 @@ export class NeuralCore {
   private outputSize: number;
 
   private layerCnt: number;
-  private biasList: number[][];
   private weightList: number[][][];
 
   private iterCnt = 0;
@@ -79,22 +78,22 @@ export class NeuralCore {
       throw 'Weight count does not match layer count';
     }
     for (let i = 0; i < weights[0].length; i++) {
-      if (weights[0][i].length !== this.inputSize) {
+      if (weights[0][i].length !== this.inputSize + 1) { //+1 for bias
         throw `Weights at hidden layer 1 of neuron ${i+1} do not match the input count`;
       }
     }
-    for (let size = 1; size < this.hiddenLayerSizes.length; size++) {
-      if (weights[size].length !== this.hiddenLayerSizes[size]) {
-        throw `Weights at hidden layer ${size+1} do not match the neuron count`;
+    for (let idx = 1; idx < this.hiddenLayerSizes.length; idx++) {
+      if (weights[idx].length !== this.hiddenLayerSizes[idx]) {
+        throw `Weights at hidden layer ${idx+1} do not match the neuron count`;
       }
-      for (let i = 0; i < weights[size].length; i++) {
-        if (weights[size][i].length !== this.hiddenLayerSizes[size-1]) {
-          throw `Weights at hidden layer ${size+1} of neuron ${i+1} do not match the input count`;
+      for (let i = 0; i < weights[idx].length; i++) {
+        if (weights[idx][i].length !== this.hiddenLayerSizes[idx-1] + 1) { //+1 for bias
+          throw `Weights at hidden layer ${idx+1} of neuron ${i+1} do not match the input count`;
         }
       }
     }
     for (let i = 0; i < weights[weights.length - 1].length; i++) {
-      if (weights[weights.length - 1][i].length !== this.hiddenLayerSizes[this.hiddenLayerSizes.length - 1]) {
+      if (weights[weights.length - 1][i].length !== this.hiddenLayerSizes[this.hiddenLayerSizes.length - 1] + 1) { //+1 for bias
         throw `Weights at output layer of neuron ${i+1} do not match the input count`;
       }
     }
@@ -102,26 +101,6 @@ export class NeuralCore {
     this.weightList = weights;
   }
 
-  private resetBiasList() {
-    let temp: number[][];
-    this.biasList = temp;
-  }
-  public setBias(biasList: number[][]) {
-    this.resetBiasList();
-    if (biasList.length !== this.hiddenLayerSizes.length + 1) {
-      throw 'Bias count does not match layer count';
-    }
-    for (let i = 0; i < biasList.length - 1; i++) {
-      if (biasList[i].length !== this.hiddenLayerSizes[i]) {
-        throw `Bias at layer ${i+1} do not match the hidden layer count`;
-      }
-    }
-    if (biasList[biasList.length - 1].length !== this.outputSize) {
-      throw `Bias at output layer do not match the output layer count`;
-    }
-
-    this.biasList = biasList;
-  }
 
   public evaluate(input: number[]): number[] {
     if (input.length != this.inputSize) {
@@ -388,12 +367,20 @@ export class NeuralCore {
       this.neurons[l].forEach(nextNeuron => { nextNeuron.resetOutputs() });
 
       this.neurons[l + 1].forEach((nextNeuron, toIdx) => { // If you wonder why this cycles are switched, it's because of the bias
+        let weights;
+        if (this.weightList && this.weightList[l] && this.weightList[toIdx]) {
+          weights = this.weightList[l][toIdx];
+        } else {
+          // Handles for example upon adding a new layer - initialize with default value of connection
+          weights = []
+        }
         this.neurons[l].forEach((currNeuron, fromIdx) => {
           let weight;
-          try {
-            weight = this.weightList[l][toIdx][fromIdx]
-          } catch {
-            // Happens if new layers have been added - use default value from Connection
+          if (weights.length > fromIdx + 1) {
+            // Do not use last weight since it corresponds to the bias
+            weight = weights[fromIdx]
+          } else {
+            // Use default value from Connection
           }
           const connection = new Connection(currNeuron, nextNeuron, weight)
           currNeuron.addOutput(connection);
@@ -401,12 +388,7 @@ export class NeuralCore {
           this.connections[l].push(connection);
         });
 
-        let bias;
-        try {
-          bias = this.biasList[l][toIdx];
-        } catch {
-          // Happens if new layers have been added - use default value from Connection
-        }
+        const bias = weights[weights.length - 1]; // Last weight corresponds to the bias
 
         // Add bias neuron to each layer
         const biasConnection = new Connection(this.biasNeuron, nextNeuron, bias);
