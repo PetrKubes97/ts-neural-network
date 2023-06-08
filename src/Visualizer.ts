@@ -112,8 +112,8 @@ export class Visualizer {
 
     this.ctx.fillStyle = `rgb(46,40,42, 1)`
     const height = 16;
-    this.ctx.font = `bold ${height}px`;
-    const text = Number(drawableNeuron.activation).toFixed(4);
+    this.ctx.font = `bold ${height}px serif`;
+    const text = Number(drawableNeuron.activation).toFixed(2);
     this.ctx.fillText(
       text,
       drawableNeuron.x - this.ctx.measureText(text).width / 2,
@@ -126,31 +126,10 @@ export class Visualizer {
     this.ctx.strokeStyle = (weight > 0) ?
       `rgba(61, 232, 255, 1)` :
       `rgba(205, 83, 52, 1)`;
-
     this.ctx.moveTo(inputNeuron.x, inputNeuron.y);
     this.ctx.lineTo(outputNeuron.x, outputNeuron.y);
     this.ctx.closePath();
     this.ctx.stroke();
-
-    // Draw connection weights
-    // y = ax + c
-    const a = (outputNeuron.y - inputNeuron.y) / (outputNeuron.x - inputNeuron.x)
-    const c = outputNeuron.y - a * outputNeuron.x
-    let x;
-    const distanceFromOrigin = 60;
-    if (inputNeuron.name.indexOf("bias") > -1) {
-      x = inputNeuron.x + (distanceFromOrigin/Math.sqrt(1+a**2))
-    } else {
-      x = outputNeuron.x - (distanceFromOrigin/Math.sqrt(1+a**2))
-    }
-    const y = a * x + c;
-
-    this.ctx.font = `12px`;
-    this.ctx.save();
-    this.ctx.translate(x, y);
-    this.ctx.rotate(Math.atan(a));
-    this.ctx.fillText(Number(weight).toFixed(4), 0, 0);
-    this.ctx.restore();
   }
 
   public getDrawableInputNeurons() {

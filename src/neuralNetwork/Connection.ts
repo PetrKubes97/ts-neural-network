@@ -1,15 +1,14 @@
 import { Neuron } from "./Neuron";
 
 export class Connection {
-  private weight: number;
+  private weight: number = Math.random() * 10 - 5;
   private inputNeuron: Neuron;
   private outputNeuron: Neuron;
   private sampleWeightChanges: number[] = [];
 
-  constructor(input: Neuron, output: Neuron, weight?: number) {
+  constructor(input: Neuron, output: Neuron) {
     this.inputNeuron = input;
     this.outputNeuron = output;
-    this.weight = weight || Math.random();
   }
 
   public addSampleWeightChange(weightChange: number) {
