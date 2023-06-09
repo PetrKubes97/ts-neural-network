@@ -2,8 +2,9 @@ import { Connection } from "./Connection";
 
 export interface Activation {
   der(x: number): number;
+
   output(x: number): number;
-};
+}
 
 export const SIGMOID: Activation = {
   output: (x: number): number => 1 / (1 + Math.exp(-x)),
@@ -28,7 +29,7 @@ export const L1Reg = {
   },
 
   der: (weight: number, connCount: number): number => {
-    return ((weight > 0) ? 1 : -1)  * (1 / connCount);
+    return ((weight > 0) ? 1 : -1) * (1 / connCount);
   }
 }
 

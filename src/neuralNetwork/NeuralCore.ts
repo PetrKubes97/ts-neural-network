@@ -1,6 +1,13 @@
 import { Neuron } from "./Neuron";
 import { Connection } from "./Connection";
-import { TrainSample, SIGMOID, Regularizations, L2Reg, getNumberOfConnections, L1Reg } from "./HelperObjects";
+import {
+  TrainSample,
+  SIGMOID,
+  Regularizations,
+  L2Reg,
+  getNumberOfConnections,
+  L1Reg
+} from "./HelperObjects";
 
 export class NeuralCore {
   private inputSize: number;
@@ -34,47 +41,19 @@ export class NeuralCore {
     this.init();
   }
 
-  private init() {
-    // Create the neurons
-    for (let l = 0; l < this.layerCnt; l++) {
-      // How many neurons are in each layer?
-      let neuronsInLayerCnt = 0;
-      switch (l) {
-        case 0:
-          neuronsInLayerCnt = this.inputSize;
-          break;
-        case this.hiddenLayerSizes.length + 1:
-          neuronsInLayerCnt = this.outputSize;
-          break;
-        default:
-          neuronsInLayerCnt = this.hiddenLayerSizes[l - 1];
-          break;
-      }
-
-      this.neurons[l] = [];
-
-      // Create them
-      for (let n = 0; n < neuronsInLayerCnt; n++) {
-        this.neurons[l][n] = new Neuron(`Neuron${l}${n}`);
-        if (l == 0) {
-          this.neurons[l][n].setAsInputNeuron(0); // just to avoid crashes, the 0 should be overriden later 
-        }
-      }
-    }
-
-    // Create the Connections
-    this.createConnections(0, this.layerCnt - 1);
-  }
-
   public evaluate(input: number[]): number[] {
 
     if (input.length != this.inputSize) {
       throw 'Input size does not match';
     }
     // Reset, so each neuron is recalculated
-    this.neurons.forEach(layer => { layer.forEach(neuron => neuron.reset()) })
+    this.neurons.forEach(layer => {
+      layer.forEach(neuron => neuron.reset())
+    })
     // Set input layer
-    this.neurons[0].forEach((neuron, idx) => { neuron.setInput(input[idx]) });
+    this.neurons[0].forEach((neuron, idx) => {
+      neuron.setInput(input[idx])
+    });
 
     this.neurons[this.layerCnt - 1].forEach(neuron => {
       neuron.calculateActivation();
@@ -226,8 +205,7 @@ export class NeuralCore {
 
     if (isHidden) {
       this.hiddenLayerSizes[layerIdx - 1] += sizeChange;
-    }
-    else if (isInput) {
+    } else if (isInput) {
       this.inputSize += sizeChange;
       this.trainSamples = [];
     } else {
@@ -240,8 +218,7 @@ export class NeuralCore {
 
       if (isHidden) {
         newNeuronIdx = this.hiddenLayerSizes[layerIdx - 1] - 1;
-      }
-      else if (isInput) {
+      } else if (isInput) {
         newNeuronIdx = this.inputSize - 1;
       } else {
         newNeuronIdx = this.outputSize - 1;
@@ -315,39 +292,6 @@ export class NeuralCore {
     this.createConnections(0, this.layerCnt - 1);
   }
 
-  private createLayerOfNeurons(layerIdx: number, layerSize: number) {
-    this.neurons[layerIdx] = [];
-    for (let i = 0; i < layerSize; i++) {
-      this.neurons[layerIdx][i] = new Neuron(`Neuron${layerIdx}${i}`);
-    }
-  }
-
-  private createConnections(firstLayer, lastLayer) {
-    for (let l = firstLayer; l < lastLayer; l++) {
-      // For each neuron in the layer add all connections to neurons in the next layer
-      this.connections[l] = [];
-
-      // Reset input & outputs
-      this.neurons[l + 1].forEach(nextNeuron => { nextNeuron.resetInputs() });
-      this.neurons[l].forEach(nextNeuron => { nextNeuron.resetOutputs() });
-
-
-      this.neurons[l + 1].forEach(nextNeuron => { // If you wonder why this cycles are switched, it's because of the bias
-        this.neurons[l].forEach(currNeuron => {
-          const connection = new Connection(currNeuron, nextNeuron)
-          currNeuron.addOutput(connection);
-          nextNeuron.addInput(connection);
-          this.connections[l].push(connection);
-        });
-
-        // Add bias neuron to each layer
-        const biasConnection = new Connection(this.biasNeuron, nextNeuron);
-        nextNeuron.addInput(biasConnection);
-        this.connections[l].push(biasConnection);
-      });
-    }
-  }
-
   public getNeurons() {
     return this.neurons;
   }
@@ -394,5 +338,74 @@ export class NeuralCore {
 
   public setTrainingSamples(samples: TrainSample[]) {
     this.trainSamples = samples;
+  }
+
+  private init() {
+    // Create the neurons
+    for (let l = 0; l < this.layerCnt; l++) {
+      // How many neurons are in each layer?
+      let neuronsInLayerCnt = 0;
+      switch (l) {
+        case 0:
+          neuronsInLayerCnt = this.inputSize;
+          break;
+        case this.hiddenLayerSizes.length + 1:
+          neuronsInLayerCnt = this.outputSize;
+          break;
+        default:
+          neuronsInLayerCnt = this.hiddenLayerSizes[l - 1];
+          break;
+      }
+
+      this.neurons[l] = [];
+
+      // Create them
+      for (let n = 0; n < neuronsInLayerCnt; n++) {
+        this.neurons[l][n] = new Neuron(`Neuron${l}${n}`);
+        if (l == 0) {
+          this.neurons[l][n].setAsInputNeuron(0); // just to avoid crashes, the 0 should be overriden later
+        }
+      }
+    }
+
+    // Create the Connections
+    this.createConnections(0, this.layerCnt - 1);
+  }
+
+  private createLayerOfNeurons(layerIdx: number, layerSize: number) {
+    this.neurons[layerIdx] = [];
+    for (let i = 0; i < layerSize; i++) {
+      this.neurons[layerIdx][i] = new Neuron(`Neuron${layerIdx}${i}`);
+    }
+  }
+
+  private createConnections(firstLayer, lastLayer) {
+    for (let l = firstLayer; l < lastLayer; l++) {
+      // For each neuron in the layer add all connections to neurons in the next layer
+      this.connections[l] = [];
+
+      // Reset input & outputs
+      this.neurons[l + 1].forEach(nextNeuron => {
+        nextNeuron.resetInputs()
+      });
+      this.neurons[l].forEach(nextNeuron => {
+        nextNeuron.resetOutputs()
+      });
+
+
+      this.neurons[l + 1].forEach(nextNeuron => { // If you wonder why this cycles are switched, it's because of the bias
+        this.neurons[l].forEach(currNeuron => {
+          const connection = new Connection(currNeuron, nextNeuron)
+          currNeuron.addOutput(connection);
+          nextNeuron.addInput(connection);
+          this.connections[l].push(connection);
+        });
+
+        // Add bias neuron to each layer
+        const biasConnection = new Connection(this.biasNeuron, nextNeuron);
+        nextNeuron.addInput(biasConnection);
+        this.connections[l].push(biasConnection);
+      });
+    }
   }
 }

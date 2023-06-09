@@ -47,7 +47,9 @@ import { Neuron } from './neuralNetwork/Neuron';
 
   if (trainRepeat.checked && interval == null) {
     trainBtn.innerText = "Stop"
-    interval = setInterval(() => { runTrainLoop(iters) }, 100);
+    interval = setInterval(() => {
+      runTrainLoop(iters)
+    }, 100);
   } else if (interval != null) {
     clearInterval(interval);
     interval = null;

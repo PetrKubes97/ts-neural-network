@@ -92,25 +92,29 @@ export class Visualizer {
     });
   }
 
+  public getDrawableInputNeurons() {
+    return this.drawableInputNeurons;
+  }
+
   private drawNeuron(drawableNeuron: DrawableNeuron) {
     // white background
     this.ctx.beginPath();
     this.ctx.arc(drawableNeuron.x, drawableNeuron.y, 25, 0, 2 * Math.PI);
-    this.ctx.fillStyle = `rgb(255,255,255)`;
+    this.ctx.fillStyle = `rgb(255, 255, 255)`;
     this.ctx.fill();
 
     this.ctx.beginPath();
     if (drawableNeuron.isBias)
-      this.ctx.fillStyle = `rgba(46,40,42, 1)`;
+      this.ctx.fillStyle = `rgba(46, 40, 42, 1)`;
     else
       this.ctx.fillStyle = `rgba(61, 232, 255, ${drawableNeuron.activation})`;
-    this.ctx.strokeStyle = `rgb(46,40,42, 1)`
+    this.ctx.strokeStyle = `rgb(46, 40, 42, 1)`
     this.ctx.lineWidth = 1;
     this.ctx.arc(drawableNeuron.x, drawableNeuron.y, 25, 0, 2 * Math.PI);
     this.ctx.fill();
     this.ctx.stroke();
 
-    this.ctx.fillStyle = `rgb(46,40,42, 1)`
+    this.ctx.fillStyle = `rgb(46, 40, 42, 1)`
     const height = 16;
     this.ctx.font = `bold ${height}px serif`;
     const text = Number(drawableNeuron.activation).toFixed(2);
@@ -130,9 +134,5 @@ export class Visualizer {
     this.ctx.lineTo(outputNeuron.x, outputNeuron.y);
     this.ctx.closePath();
     this.ctx.stroke();
-  }
-
-  public getDrawableInputNeurons() {
-    return this.drawableInputNeurons;
   }
 }
