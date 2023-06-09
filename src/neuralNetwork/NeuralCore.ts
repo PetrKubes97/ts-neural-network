@@ -8,7 +8,6 @@ export class NeuralCore {
   private outputSize: number;
 
   private layerCnt: number;
-  private weightList: number[][][];
 
   private iterCnt = 0;
 
@@ -67,13 +66,27 @@ export class NeuralCore {
     this.createConnections(0, this.layerCnt - 1);
   }
 
-  private resetWeights() {
-    let temp: number[][][];
-    this.weightList = temp;
+  public randomWeights() {
+    this.connections.forEach(connPerLayer => {
+      connPerLayer.forEach(conn => {
+        conn.setWeight(Math.random() - 0.5);
+      })
+    });
+  }
+  private updateConnections(weights: number[][][]) {
+    this.connections.forEach((connPerLayer, l) => {
+      const layerSize = this.hiddenLayerSizes[l] || this.outputSize;
+      const weightsPerNeuron = connPerLayer.length / layerSize;
+      for (let neuron = 0; neuron < layerSize; neuron++) {
+        for (let weightIdx = 0; weightIdx < weightsPerNeuron; weightIdx++) {
+          const connIdx = weightIdx + neuron * weightsPerNeuron;
+          connPerLayer[connIdx].setWeight(weights[l][neuron][weightIdx]);
+        }
+      }
+    })
   }
 
   public setWeights(weights: number[][][]) {
-    this.resetWeights();
     if (weights.length !== this.layerCnt - 1) {
       throw 'Weight count does not match layer count';
     }
@@ -98,7 +111,7 @@ export class NeuralCore {
       }
     }
 
-    this.weightList = weights;
+    this.updateConnections(weights);
   }
 
 
@@ -366,32 +379,16 @@ export class NeuralCore {
       this.neurons[l + 1].forEach(nextNeuron => { nextNeuron.resetInputs() });
       this.neurons[l].forEach(nextNeuron => { nextNeuron.resetOutputs() });
 
-      this.neurons[l + 1].forEach((nextNeuron, toIdx) => { // If you wonder why this cycles are switched, it's because of the bias
-        let weights;
-        if (this.weightList && this.weightList[l] && this.weightList[toIdx]) {
-          weights = this.weightList[l][toIdx];
-        } else {
-          // Handles for example upon adding a new layer - initialize with default value of connection
-          weights = []
-        }
-        this.neurons[l].forEach((currNeuron, fromIdx) => {
-          let weight;
-          if (weights.length > fromIdx + 1) {
-            // Do not use last weight since it corresponds to the bias
-            weight = weights[fromIdx]
-          } else {
-            // Use default value from Connection
-          }
-          const connection = new Connection(currNeuron, nextNeuron, weight)
+      this.neurons[l + 1].forEach((nextNeuron) => { // If you wonder why this cycles are switched, it's because of the bias
+        this.neurons[l].forEach((currNeuron) => {
+          const connection = new Connection(currNeuron, nextNeuron)
           currNeuron.addOutput(connection);
           nextNeuron.addInput(connection);
           this.connections[l].push(connection);
         });
 
-        const bias = weights[weights.length - 1]; // Last weight corresponds to the bias
-
         // Add bias neuron to each layer
-        const biasConnection = new Connection(this.biasNeuron, nextNeuron, bias);
+        const biasConnection = new Connection(this.biasNeuron, nextNeuron);
         nextNeuron.addInput(biasConnection);
         this.connections[l].push(biasConnection);
       });

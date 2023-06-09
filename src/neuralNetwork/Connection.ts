@@ -9,7 +9,7 @@ export class Connection {
   constructor(input: Neuron, output: Neuron, weight?: number) {
     this.inputNeuron = input;
     this.outputNeuron = output;
-    this.weight = weight || Math.random();
+    this.weight = weight || Math.random() - 0.5;
   }
 
   public addSampleWeightChange(weightChange: number) {
@@ -24,6 +24,10 @@ export class Connection {
 
   public getWeight() {
     return this.weight;
+  }
+
+  public setWeight(weight: number) {
+    this.weight = weight;
   }
 
   public calculateValue() {
