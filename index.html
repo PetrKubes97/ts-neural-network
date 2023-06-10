@@ -101,10 +101,10 @@
         <h5>Training set input</h5>
         <textarea class="form-control" id="training-set-input" rows="6">
 [
-  [[1,1],[0]],
-  [[1,0],[1]],
-  [[0,1],[1]],
-  [[0,0],[0]]
+  [[0.2,0.1,0.7],[1,0]],
+  [[0.6,0.1,0.3],[0,1]],
+  [[0.4,0.3,0.3],[1,0]],
+  [[0, 0.8, 0.2],[0,1]]
 ]</textarea>
         <button type="button" class="btn btn-outline-primary btn-sm mt-3"
                 onclick="setTrainingData()">Set training
@@ -121,6 +121,25 @@
           <tbody id="training-set-data-output">
           </tbody>
         </table>
+        <div><i>Hint: Click on an entry in the table to activate an input</i></div>
+      </div>
+    </div>
+    <div class="row mt-3">
+      <div class="col-6">
+        <h5>Weights</h5>
+        <textarea class="form-control" id="training-set-weights" rows="6">
+[
+    [[0.1, 0.2, 0.6, 0.3], [0.4, 0.3, 0.1, 0.2]],
+    [[0.2, 0.1, 0.5], [0.1, 0.4, 0.8], [0.5, 0.2, 0.3]],
+    [[0.2, 0.1, 0.5, 0.1], [0.1, 0.4, 0.8, 0.4]]
+]</textarea>
+        <button type="button" class="btn btn-outline-primary btn-sm mt-3"
+                onclick="setWeights()">Set
+          Weights
+        </button>
+        <button type="button" class="btn btn-outline-secondary btn-sm mt-3"
+                onclick="randomWeights()">Random Weights
+        </button>
       </div>
     </div>
     <hr>
@@ -172,7 +191,7 @@
       first connected
       neuron. To calculate
       the value of some neuron you add the values of all incoming connections and apply the
-      <a target="_blank" href="https://www.desmos.com/calculator/dw9fmqwlmn">sigmoid</a> function to
+      <a target="_blank" href="https://www.desmos.com/calculator/dw9fmqwlmn">sigmoid</a>function to
       that sum. Other
       activation functions are possible, but I have not implemented them yet.
     </p>
