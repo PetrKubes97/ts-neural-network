@@ -73,7 +73,6 @@ const runTrainLoop = (iters: number) => {
     dataArr.forEach((sample) => {
       neuralCore.addTrainingSet(sample[0], sample[1]);
     });
-    neuralCore.reset();
     updateUI();
   } catch (err) {
     alert(err);
@@ -176,6 +175,7 @@ const initCore = () => {
 
 const updateUI = () => {
   neuralCore.evaluate(input);
+  visualizer.draw(neuralCore.getNeurons(), neuralCore.getConnections());
 
   let content = addLayerControlRow(
     'Layers',
@@ -253,7 +253,6 @@ const updateUI = () => {
     trainingData += '</tr>';
   });
   trainingSetDataOutput.innerHTML = trainingData;
-  visualizer.draw(neuralCore.getNeurons(), neuralCore.getConnections());
 }
 
 const addLayerControlRow = (label: string, size: string, onclickPos: string, onclickNeg: string): string => {
