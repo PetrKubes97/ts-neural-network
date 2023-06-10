@@ -1,6 +1,13 @@
 import { Neuron } from "./Neuron";
 import { Connection } from "./Connection";
-import { TrainSample, SIGMOID, Regularizations, L2Reg, getNumberOfConnections, L1Reg } from "./HelperObjects";
+import {
+  TrainSample,
+  SIGMOID,
+  Regularizations,
+  L2Reg,
+  getNumberOfConnections,
+  L1Reg
+} from "./HelperObjects";
 
 export class NeuralCore {
   private inputSize: number;
@@ -73,6 +80,7 @@ export class NeuralCore {
       })
     });
   }
+
   private updateConnections(weights: number[][][]) {
     this.connections.forEach((connPerLayer, l) => {
       const layerSize = this.hiddenLayerSizes[l] || this.outputSize;
@@ -92,22 +100,22 @@ export class NeuralCore {
     }
     for (let i = 0; i < weights[0].length; i++) {
       if (weights[0][i].length !== this.inputSize + 1) { //+1 for bias
-        throw `Weights at hidden layer 1 of neuron ${i+1} do not match the input count`;
+        throw `Weights at hidden layer 1 of neuron ${i + 1} do not match the input count`;
       }
     }
     for (let idx = 1; idx < this.hiddenLayerSizes.length; idx++) {
       if (weights[idx].length !== this.hiddenLayerSizes[idx]) {
-        throw `Weights at hidden layer ${idx+1} do not match the neuron count`;
+        throw `Weights at hidden layer ${idx + 1} do not match the neuron count`;
       }
       for (let i = 0; i < weights[idx].length; i++) {
-        if (weights[idx][i].length !== this.hiddenLayerSizes[idx-1] + 1) { //+1 for bias
-          throw `Weights at hidden layer ${idx+1} of neuron ${i+1} do not match the input count`;
+        if (weights[idx][i].length !== this.hiddenLayerSizes[idx - 1] + 1) { //+1 for bias
+          throw `Weights at hidden layer ${idx + 1} of neuron ${i + 1} do not match the input count`;
         }
       }
     }
     for (let i = 0; i < weights[weights.length - 1].length; i++) {
       if (weights[weights.length - 1][i].length !== this.hiddenLayerSizes[this.hiddenLayerSizes.length - 1] + 1) { //+1 for bias
-        throw `Weights at output layer of neuron ${i+1} do not match the input count`;
+        throw `Weights at output layer of neuron ${i + 1} do not match the input count`;
       }
     }
 
@@ -120,9 +128,13 @@ export class NeuralCore {
       throw 'Input size does not match';
     }
     // Reset, so each neuron is recalculated
-    this.neurons.forEach(layer => { layer.forEach(neuron => neuron.reset()) })
+    this.neurons.forEach(layer => {
+      layer.forEach(neuron => neuron.reset())
+    })
     // Set input layer
-    this.neurons[0].forEach((neuron, idx) => { neuron.setInput(input[idx]) });
+    this.neurons[0].forEach((neuron, idx) => {
+      neuron.setInput(input[idx])
+    });
 
     this.neurons[this.layerCnt - 1].forEach(neuron => {
       neuron.calculateActivation();
@@ -273,8 +285,7 @@ export class NeuralCore {
 
     if (isHidden) {
       this.hiddenLayerSizes[layerIdx - 1] += sizeChange;
-    }
-    else if (isInput) {
+    } else if (isInput) {
       this.inputSize += sizeChange;
       this.trainSamples = [];
     } else {
@@ -287,8 +298,7 @@ export class NeuralCore {
 
       if (isHidden) {
         newNeuronIdx = this.hiddenLayerSizes[layerIdx - 1] - 1;
-      }
-      else if (isInput) {
+      } else if (isInput) {
         newNeuronIdx = this.inputSize - 1;
       } else {
         newNeuronIdx = this.outputSize - 1;
@@ -376,8 +386,12 @@ export class NeuralCore {
       this.connections[l] = [];
 
       // Reset input & outputs
-      this.neurons[l + 1].forEach(nextNeuron => { nextNeuron.resetInputs() });
-      this.neurons[l].forEach(nextNeuron => { nextNeuron.resetOutputs() });
+      this.neurons[l + 1].forEach(nextNeuron => {
+        nextNeuron.resetInputs()
+      });
+      this.neurons[l].forEach(nextNeuron => {
+        nextNeuron.resetOutputs()
+      });
 
       this.neurons[l + 1].forEach((nextNeuron) => { // If you wonder why this cycles are switched, it's because of the bias
         this.neurons[l].forEach((currNeuron) => {

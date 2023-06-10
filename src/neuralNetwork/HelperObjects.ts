@@ -2,6 +2,7 @@ import { Connection } from "./Connection";
 
 export interface Activation {
   der(x: number): number;
+
   output(x: number): number;
 };
 
@@ -28,7 +29,7 @@ export const L1Reg = {
   },
 
   der: (weight: number, connCount: number): number => {
-    return ((weight > 0) ? 1 : -1)  * (1 / connCount);
+    return ((weight > 0) ? 1 : -1) * (1 / connCount);
   }
 }
 

@@ -47,7 +47,9 @@ import { Neuron } from './neuralNetwork/Neuron';
 
   if (trainRepeat.checked && interval == null) {
     trainBtn.innerText = "Stop"
-    interval = setInterval(() => { runTrainLoop(iters) }, 100);
+    interval = setInterval(() => {
+      runTrainLoop(iters)
+    }, 100);
   } else if (interval != null) {
     clearInterval(interval);
     interval = null;
@@ -78,22 +80,22 @@ const runTrainLoop = (iters: number) => {
   }
 }
 (window as any).randomWeights = () => {
-      weightsInput.value = '[]'
-      try {
-        neuralCore.randomWeights();
-      } catch (err) {
-        alert(err);
-      }
-      updateUI()
+  weightsInput.value = '[]'
+  try {
+    neuralCore.randomWeights();
+  } catch (err) {
+    alert(err);
+  }
+  updateUI()
 }
 (window as any).setWeights = () => {
   try {
-      const weights: number[][][] = JSON.parse(weightsInput.value);
-      neuralCore.setWeights(weights);
-      updateUI();
-    } catch (err) {
-      alert(err);
-    }
+    const weights: number[][][] = JSON.parse(weightsInput.value);
+    neuralCore.setWeights(weights);
+    updateUI();
+  } catch (err) {
+    alert(err);
+  }
 }
 
 (window as any).reset = () => {

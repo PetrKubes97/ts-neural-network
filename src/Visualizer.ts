@@ -96,21 +96,21 @@ export class Visualizer {
     // white background
     this.ctx.beginPath();
     this.ctx.arc(drawableNeuron.x, drawableNeuron.y, 25, 0, 2 * Math.PI);
-    this.ctx.fillStyle = `rgb(255,255,255)`;
+    this.ctx.fillStyle = `rgb(255, 255, 255)`;
     this.ctx.fill();
 
     this.ctx.beginPath();
     if (drawableNeuron.isBias)
-      this.ctx.fillStyle = `rgba(46,40,42, 1)`;
+      this.ctx.fillStyle = `rgba(46, 40, 42, 1)`;
     else
       this.ctx.fillStyle = `rgba(61, 232, 255, ${drawableNeuron.activation})`;
-    this.ctx.strokeStyle = `rgb(46,40,42, 1)`
+    this.ctx.strokeStyle = `rgb(46, 40, 42, 1)`
     this.ctx.lineWidth = 1;
     this.ctx.arc(drawableNeuron.x, drawableNeuron.y, 25, 0, 2 * Math.PI);
     this.ctx.fill();
     this.ctx.stroke();
 
-    this.ctx.fillStyle = `rgb(46,40,42, 1)`
+    this.ctx.fillStyle = `rgb(46, 40, 42, 1)`
     const height = 16;
     this.ctx.font = `bold ${height}px`;
     const text = Number(drawableNeuron.activation).toFixed(4);
@@ -139,9 +139,9 @@ export class Visualizer {
     let x;
     const distanceFromOrigin = 60;
     if (inputNeuron.name.indexOf("bias") > -1) {
-      x = inputNeuron.x + (distanceFromOrigin/Math.sqrt(1+a**2))
+      x = inputNeuron.x + (distanceFromOrigin / Math.sqrt(1 + a ** 2))
     } else {
-      x = outputNeuron.x - (distanceFromOrigin/Math.sqrt(1+a**2))
+      x = outputNeuron.x - (distanceFromOrigin / Math.sqrt(1 + a ** 2))
     }
     const y = a * x + c;
 
