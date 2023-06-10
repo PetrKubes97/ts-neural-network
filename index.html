@@ -55,8 +55,7 @@
         </div>
         <div class="row mt-1 mb-1">
           <label for="regularization-input" class="col-8">Regularization:</label>
-          <select class="form-control form-control-sm col-4"
-                  id="regularization-type-input">
+          <select class="form-control form-control-sm col-4" id="regularization-type-input">
             <option value="none">None</option>
             <option value="L1">L1</option>
             <option value="L2">L2</option>
@@ -64,8 +63,7 @@
         </div>
         <div class="row">
           <label for="regularization-input" class="col-8">Regularization rate:</label>
-          <select class="form-control form-control-sm col-4"
-                  id="regularization-rate-input">
+          <select class="form-control form-control-sm col-4" id="regularization-rate-input">
             <option value="0.00001">0.00001</option>
             <option value="0.00003">0.00003</option>
             <option value="0.0001">0.0001</option>
@@ -150,8 +148,7 @@
         <label style="margin: 8px">
           <input type="checkbox" style="margin-right: 4px" id="train-repeat-chckbx">Repeat
         </label>
-        <button type="button" id="train-btn" class="btn btn-primary mr-2"
-                onclick="train(true)">
+        <button type="button" id="train-btn" class="btn btn-primary mr-2" onclick="train(true)">
           Train
         </button>
         <button type="button" class="btn btn-secondary" onclick="train(false)">Step</button>
@@ -180,62 +177,49 @@
     <h5>Cost function</h5>
     <p>The cost is defined as \(C = \frac{1}{2 \times
       sampleCnt}\sum^{sampleCnt}_{m=1}(\sum^{outputSize}_{n=1}(neruon_n-target_n)^2)\).
-      In words: Error is defined as \((value - target)^2\). To get error of neural network for
-      one
+      In words: Error is defined as \((value - target)^2\). To get error of neural network for one
       training sample,
       you
-      simply add errors of all output neurons. The total cost is then defined as average error
-      of
+      simply add errors of all output neurons. The total cost is then defined as average error of
       all training
       samples.
     </p>
     <h5>Forward propagation</h5>
     <p>
-      Let's say that the value of connection is the connection's weight (how wide it is) times
-      the
+      Let's say that the value of connection is the connection's weight (how wide it is) times the
       first connected
       neuron. To calculate
       the value of some neuron you add the values of all incoming connections and apply the
-      <a target="_blank" href="https://www.desmos.com/calculator/dw9fmqwlmn">sigmoid</a>
-      function to
+      <a target="_blank" href="https://www.desmos.com/calculator/dw9fmqwlmn">sigmoid</a>function to
       that sum. Other
       activation functions are possible, but I have not implemented them yet.
     </p>
     <h5>Back propagation</h5>
-    <p>The cost function defined above is a function dependend on weights of connections in the
-      same
+    <p>The cost function defined above is a function dependend on weights of connections in the same
       way as \(f(x, y)
       = x^2
-      + y^2\) is dependend on x and y. In the beginning, the weights are random. Let's say x =
-      5 and
+      + y^2\) is dependend on x and y. In the beginning, the weights are random. Let's say x = 5 and
       y = 3. The cost
       at
-      this point would be 25 + 9 = 34, which we want to get to 0. Now we take the derivate
-      with
+      this point would be 25 + 9 = 34, which we want to get to 0. Now we take the derivate with
       respect to each of
       these
-      weights, which tells us how to adjust the wieghts to minimize the function.
-      \(\frac{\partial
+      weights, which tells us how to adjust the wieghts to minimize the function. \(\frac{\partial
       f(x, y)}{\partial
       x}
-      = 2x\), \(\frac{\partial f(x, y)}{\partial y} = 2y\). Now that we have the derivatives,
-      we
+      = 2x\), \(\frac{\partial f(x, y)}{\partial y} = 2y\). Now that we have the derivatives, we
       know the "direction"
       in
-      which to change the weights. \(x_{new} = x_{old} - rate \times 2x = 5 - 0.1 \times 2
-      \times 5
+      which to change the weights. \(x_{new} = x_{old} - rate \times 2x = 5 - 0.1 \times 2 \times 5
       = 4\) and that's
       a
-      little bit closer to the desired 0 result of f(x, y). The rate is necessary to avoid
-      stepping
+      little bit closer to the desired 0 result of f(x, y). The rate is necessary to avoid stepping
       over the minimum.</p>
     <p>
-      In practice is the computation of the derivatives is a little bit harder, but all you
-      need to
+      In practice is the computation of the derivatives is a little bit harder, but all you need to
       know is the
       <i>chain rule</i>. I highly recommend
-      <a target="_blank" href="https://www.youtube.com/watch?v=aircAruvnKk">3blue1brown's
-        series</a>
+      <a target="_blank" href="https://www.youtube.com/watch?v=aircAruvnKk">3blue1brown's series</a>
       and
       <a target="_blank"
          href="https://web.archive.org/web/20150317210621/https://www4.rgu.ac.uk/files/chapter3%20-%20bp.pdf">this
@@ -244,8 +228,7 @@
 
     <p>
       If you have enjoyed this project, you might also like my <a href="http://gifmemes.io"
-                                                                  target="_blank">tool for
-      creating
+                                                                  target="_blank">tool for creating
       gif memes</a>.
     </p>
     <footer class="futter m-5" style="text-align: center;">
@@ -253,8 +236,7 @@
       <a target="_blank"
          href="mailto:petrkubes1997@gmail.com?Subject=Nerual%20network%20-%20suggestion/hate/or%20just%20saying%20hi"
          target="_top">Petr Kubeš</a>,
-      <a target="_blank" href="https://github.com/PetrKubes97/ts-neural-network"
-         target="_top">source
+      <a target="_blank" href="https://github.com/PetrKubes97/ts-neural-network" target="_top">source
         code</a>
     </footer>
 

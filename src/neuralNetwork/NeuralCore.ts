@@ -124,6 +124,7 @@ export class NeuralCore {
 
 
   public evaluate(input: number[]): number[] {
+
     if (input.length != this.inputSize) {
       throw 'Input size does not match';
     }
@@ -191,6 +192,7 @@ export class NeuralCore {
       this.neurons[this.layerCnt - 1].forEach((neuron, idx) => {
         const newSigma =
           (sample.output[idx] - neuron.getActivation()) * SIGMOID.der(neuron.getActivation());
+
         neuron.setSigma(newSigma);
       });
 
@@ -310,10 +312,9 @@ export class NeuralCore {
       if (isInput)
         newNeuron.setAsInputNeuron(0);
 
-
       //// Add connections from the prev layer
       if (!isInput) {
-        this.neurons[layerIdx - 1].forEach((neuron, idx) => {
+        this.neurons[layerIdx - 1].forEach((neuron) => {
           const connection = new Connection(neuron, newNeuron);
           neuron.addOutput(connection);
           newNeuron.addInput(connection);
@@ -327,7 +328,7 @@ export class NeuralCore {
 
       if (!isOutput) {
         //// Add connections to the next layer
-        this.neurons[layerIdx + 1].forEach((neuron, idx) => {
+        this.neurons[layerIdx + 1].forEach((neuron) => {
           const connection = new Connection(newNeuron, neuron);
           neuron.addInput(connection);
           this.connections[layerIdx].push(connection);

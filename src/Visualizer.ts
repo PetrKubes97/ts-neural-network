@@ -92,6 +92,10 @@ export class Visualizer {
     });
   }
 
+  public getDrawableInputNeurons() {
+    return this.drawableInputNeurons;
+  }
+
   private drawNeuron(drawableNeuron: DrawableNeuron) {
     // white background
     this.ctx.beginPath();
@@ -151,9 +155,5 @@ export class Visualizer {
     this.ctx.rotate(Math.atan(a));
     this.ctx.fillText(Number(weight).toFixed(4), 0, 0);
     this.ctx.restore();
-  }
-
-  public getDrawableInputNeurons() {
-    return this.drawableInputNeurons;
   }
 }
