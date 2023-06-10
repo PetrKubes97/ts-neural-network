@@ -80,7 +80,6 @@ const runTrainLoop = (iters: number) => {
   }
 }
 (window as any).randomWeights = () => {
-  weightsInput.value = '[]'
   try {
     neuralCore.randomWeights();
   } catch (err) {
